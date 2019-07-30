@@ -1,23 +1,47 @@
 package com.github.guillesup.entities;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class MachineTest {
 
-    @Before
-    public void setUp() throws Exception {
-    }
-
     @Test(expected = MachineException.class)
-    public void whenMachineIdLessThanZero(){
+    public void whenMachineIdLessThanZero() {
         new Machine(-1);
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @Test
+    public void machineEqualsToItself() {
+        Machine machine = new Machine(1);
+        assertEquals(machine, machine);
+    }
+
+    @Test
+    public void machineNotEqualsToNull() {
+        Machine machine = new Machine(1);
+        assertNotEquals(machine, null);
+    }
+
+    @Test
+    public void objectIsInstanceOfMachineButNotEquals() {
+        Machine machineOne = new Machine(1);
+        Machine machineTwo = new Machine(2);
+        assertNotEquals(machineOne, (Object) machineTwo);
+    }
+
+    @Test
+    public void machineOneEqualToMachineTwo() {
+        Machine machineOne = new Machine(1);
+        Machine machineTwo = new Machine(1);
+        assertEquals(machineOne, machineTwo);
+    }
+
+    @Test
+    public void sameHashCode() {
+        Machine machineOne = new Machine(1);
+        Machine machineTwo = new Machine(1);
+        assertEquals(machineOne.hashCode(), machineTwo.hashCode());
     }
 }
