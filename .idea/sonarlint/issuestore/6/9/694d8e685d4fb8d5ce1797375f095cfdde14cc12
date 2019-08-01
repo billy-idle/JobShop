@@ -1,49 +1,0 @@
-
-\
-squid:S106‹"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ8¶üÂ-
-bsquid:S1854Ç">Remove this useless assignment to local variable "tiempoIni2".(¿ÇøÕşÿÿÿÿ8¶üÂ-
-\
-squid:S106ä"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ8¶üÂ-
-Tsquid:S1481'"6Remove this unused "numeroOperaciones" local variable.(ÙæŠà8¶üÂ-
-qsquid:S3776"SRefactor this method to reduce its Cognitive Complexity from 131 to the 15 allowed.(Çµí‘8¶üÂ-
-vsquid:S00117§"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(±çÀ£ùÿÿÿÿ8¶üÂ-
-Wsquid:S1481:"4Remove this unused "operationpedido" local variable.(Ìş”µøÿÿÿÿ8¶üÂ-
-vsquid:S00117—"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(õ¸•üÿÿÿÿ8¶üÂ-
-Dsquid:S1481o"&Remove this unused "j" local variable.(ÎÍ¬˜8¶üÂ-
-W
-squid:S106æ"9Replace this use of System.out or System.err by a logger.(â ¬Ù8¶üÂ-
-Osquid:S1481",Remove this unused "archivo" local variable.(á½ˆãüÿÿÿÿ8¶üÂ-
-\
-squid:S106"9Replace this use of System.out or System.err by a logger.(ÂÉœ³ÿÿÿÿÿ8¶üÂ-
-Ysquid:S1854";Remove this useless assignment to local variable "archivo".(ñ¯ØÑ8¶üÂ-
-csquid:S2095"EUse try-with-resources or close this "Scanner" in a "finally" clause.(ñ¯ØÑ8¶üÂ-
-[
-squid:S106J"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ8¶üÂ-
-\
-squid:S106°"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ8¶üÂ-
-Ssquid:S1481À"/Remove this unused "tiempoIni2" local variable.(éÈˆÀøÿÿÿÿ8¶üÂ-
-Dsquid:S1659¡"%Declare "tiempoF" on a separate line.(ùûœî8¶üÂ-
-Rsquid:S1066["/Merge this if statement with the enclosing one.(û‹Áüÿÿÿÿ8¶üÂ-
-[
-squid:S106"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ8¶üÂ-
-vsquid:S00117Ë"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ª•å€ûÿÿÿÿ8¶üÂ-
-vsquid:S00117˜"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÒÂøÿÿÿÿ8¶üÂ-
-Ssquid:S1854o"5Remove this useless assignment to local variable "j".(ÎÍ¬˜8¶üÂ-
-V
-squid:S106ß"9Replace this use of System.out or System.err by a logger.(Õì‰%8¶üÂ-
-vsquid:S00117Í"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è‹á÷üÿÿÿÿ8¶üÂ-
-fsquid:S1854:"CRemove this useless assignment to local variable "operationpedido".(Ìş”µøÿÿÿÿ8¶üÂ-
-^squid:S1854Ö"?Remove this useless assignment to local variable "rutaCritica".(ÏÚ¦À8¶üÂ-
-osquid:S2095"LUse try-with-resources or close this "BufferedReader" in a "finally" clause.(¨ÎĞşÿÿÿÿ8¶üÂ-
-Jsquid:S1068"'Remove this unused "pos" private field.(‘«•»şÿÿÿÿ8µšÈèÁ-
-isquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ø›éŒ8¶üÂ-
-\
-squid:S106Ğ"9Replace this use of System.out or System.err by a logger.(Â„Š»ÿÿÿÿÿ8¶üÂ-
-csquid:S1854'"ERemove this useless assignment to local variable "numeroOperaciones".(ÙæŠà8¶üÂ-
-vsquid:S00117­"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è‹á÷üÿÿÿÿ8¶üÂ-
-\
-squid:S106Ç"9Replace this use of System.out or System.err by a logger.(ÂÊ·ûÿÿÿÿ8¶üÂ-
-qsquid:S00117¦"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(šÿí8¶üÂ-
-Osquid:S1481Ö"0Remove this unused "rutaCritica" local variable.(ÏÚ¦À8¶üÂ-
-[
-squid:S106k"9Replace this use of System.out or System.err by a logger.(â´•­ıÿÿÿÿ8¶üÂ-

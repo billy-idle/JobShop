@@ -17,10 +17,10 @@ import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class ProblemLoader {
-    private List<Problem> problems;
+    private final List<Problem> problems;
     private Path workPath;
     private List<String> fileContent;
-    private List<Path> filesPath;
+    private final List<Path> filesPath;
 
     public ProblemLoader() {
         this.problems = new ArrayList<>();
@@ -28,6 +28,16 @@ public class ProblemLoader {
         this.filesPath = new ArrayList<>();
 
         setWorkPath();
+        seekFiles();
+        filesToProblems();
+    }
+
+    public ProblemLoader(String workPath) {
+        this.problems = new ArrayList<>();
+        this.fileContent = new ArrayList<>();
+        this.filesPath = new ArrayList<>();
+
+        this.workPath = Paths.get(workPath);
         seekFiles();
         filesToProblems();
     }

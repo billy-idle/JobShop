@@ -1,12 +1,13 @@
 package com.github.guillesup.entities;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 public class Problem {
-    private String id;
-    private List<Integer> settings;
-    private List<Job> jobs;
+    private final String id;
+    private final List<Integer> settings;
+    private final List<Job> jobs;
 
     public Problem(String id, List<Integer> settings, List<Job> jobs) {
         this.id = Objects.requireNonNull(id, "Problem id required!");
@@ -18,28 +19,16 @@ public class Problem {
         return this.id;
     }
 
-    public List<Job> getJobs() {
-        return this.jobs;
-    }
-
     public List<Integer> getSettings() {
         return this.settings;
     }
 
-    @Override
-    public String toString() {
-        String dashes = "-------------------------------------------------\n";
-        String header = String.format(" %-11s%s%n %-10s\t%s%n %-10s%s%n %-10s\t%s%n%n",
-                "Problem: ", this.id, "#Jobs: ", getNumberOfJobs(),
-                "#Machines: ", getNumberOfMachines(), "#Tasks: ", getNumberOfTasks());
+    public List<Job> getJobs() {
+        return this.jobs;
+    }
 
-        StringBuilder body = new StringBuilder();
-
-        for (Job job : this.jobs) {
-            body.append(job.toString()).append("\n");
-        }
-
-        return dashes + header + dashes + body;
+    public void sort() {
+        this.jobs.sort(Collections.reverseOrder());
     }
 
     public int getNumberOfJobs() {
@@ -52,5 +41,29 @@ public class Problem {
 
     public int getNumberOfTasks() {
         return this.settings.get(2);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 *
+                Objects.hashCode(this.id) +
+                Objects.hashCode(this.settings) +
+                Objects.hashCode(this.jobs);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null)
+            return false;
+
+        if (o == this)
+            return true;
+
+        if (!(o instanceof Problem))
+            return false;
+
+        Problem otherProblem = (Problem) o;
+
+        return (this.jobs.equals(otherProblem.jobs));
     }
 }

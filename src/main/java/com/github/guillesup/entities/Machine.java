@@ -3,7 +3,7 @@ package com.github.guillesup.entities;
 import java.util.Objects;
 
 public class Machine {
-    private int id;
+    private final int id;
 
     public Machine(int id) {
         this.id = id;
@@ -12,7 +12,7 @@ public class Machine {
 
     private void assesInput() {
         if (this.id <= 0) {
-            throw new MachineException("Machine id must be greater than zero");
+            throw new MachineException();
         }
     }
 
@@ -33,21 +33,16 @@ public class Machine {
             return false;
 
         Machine otherMachine = (Machine) o;
-        return (this.id == otherMachine.getId());
+        return (this.id == otherMachine.id);
     }
 
-    public int getId() {
+    int getId() {
         return this.id;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(this.id);
     }
 }
 
 class MachineException extends RuntimeException {
-    MachineException(String message) {
-        super(message);
+    MachineException() {
+        super("Machine id must be greater than zero");
     }
 }

@@ -1,35 +1,30 @@
 package com.github.guillesup.entities;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.*;
 
 public class JobTest {
-    private List<Job> jobs;
-    private List<Machine> machines;
     private List<Task> tasks;
 
     @Before
     public void setUp() {
-        createThreeMachines();
         createEightTasks();
-        createThreeJobs();
     }
 
-    private void createThreeMachines() {
-        machines = new ArrayList<>(3);
+    private void createEightTasks() {
+        List<Machine> machines = new ArrayList<>(3);
 
         machines.add(new Machine(1));
         machines.add(new Machine(2));
         machines.add(new Machine(3));
-    }
 
-    private void createEightTasks() {
         tasks = new ArrayList<>(8);
 
         tasks.add(new Task(1, machines.get(0), 3));
@@ -44,57 +39,140 @@ public class JobTest {
         tasks.add(new Task(8, machines.get(2), 3));
     }
 
-    private void createThreeJobs() {
-        jobs = new ArrayList<>(3);
-
-        jobs.add(new Job(1, 0, 800, 1.0, tasks.subList(0, 3)));
-        jobs.add(new Job(2, 0, 810, 2.0, tasks.subList(3, 6)));
-        jobs.add(new Job(3, 0, 820, 3.0, tasks.subList(6, 8)));
-    }
-
-    @Test
-    @Ignore
-    public void printJobs() {
-        StringBuilder actual = new StringBuilder();
-        String expected =
-                "Job 0 = [(0, 3), (1, 2), (2, 2)]\n" +
-                        "Job 1 = [(0, 2), (2, 1), (1, 4)]\n" +
-                        "Job 2 = [(1, 4), (2, 3)]\n";
-
-        for (Job job : jobs) {
-            actual.append(job.toString()).append("\n");
-        }
-
-        assertEquals(expected, actual.toString());
+    @Test(expected = JobException.class)
+    public void idLessThanZero() {
+        new Job(-1, 0, 800, 1.0, this.tasks);
     }
 
     @Test(expected = JobException.class)
-    public void whenIdIsLessThanZero() {
-        new Job(-1, 0, 0, 0.0, this.tasks);
+    public void idEqualToZero() {
+        new Job(0, 0, 800, 1.0, this.tasks);
     }
 
     @Test(expected = JobException.class)
-    public void whenStartTimeIsLessThanZero() {
-        new Job(0, -1, 0, 0.0, this.tasks);
+    public void startTimeLessThanZero() {
+        new Job(1, -1, 800, 1.0, this.tasks);
     }
 
     @Test(expected = JobException.class)
-    public void whenDueDateIsLessThanZero() {
-        new Job(0, 0, -1, 0.0, this.tasks);
+    public void dueDateLessThanZero() {
+        new Job(1, 0, -1, 1.0, this.tasks);
     }
 
     @Test(expected = JobException.class)
-    public void whenIdWeightLessThanZero() {
-        new Job(0, 0, 0, -1.0, this.tasks);
+    public void weightLessThanZero() {
+        new Job(1, 0, 800, -1.0, this.tasks);
+    }
+
+    @Test(expected = JobException.class)
+    public void weightEqualToZero() {
+        new Job(1, 0, 800, 0.0, this.tasks);
     }
 
     @Test(expected = JobException.class)
     public void whenTasksIsEmpty() {
-        new Job(0, 0, 0, 0.0, new ArrayList<>());
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(new Task(1, new Machine(1), 1));
+        tasks.clear();
+
+        new Job(1, 0, 800, 1.0, tasks);
     }
 
     @Test(expected = NullPointerException.class)
-    public void whenTasksIsNull() {
+    public void tasksIsNull() {
         new Job(0, 0, 0, 0.0, null);
+    }
+
+    @Test
+    public void differentJobsSameHash() {
+        assertEquals(createDefaultJob().hashCode(), createDefaultJob().hashCode());
+    }
+
+    private Job createDefaultJob() {
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(new Task(1, new Machine(1), 1));
+
+        return new Job(1, 0, 800, 1.0, tasks);
+    }
+
+    @Test
+    public void testGetters() {
+        Job job = createDefaultJob();
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(new Task(1, new Machine(1), 1));
+
+        assertTrue(job.getId() == 1 &&
+                job.getStartTime() == 0 &&
+                job.getDueDate() == 800 &&
+                Double.compare(job.getWeight(), 1.0) == 0 &&
+                job.getTasks().equals(tasks) &&
+                job.getNumberOfTasks() == 1);
+    }
+
+    @Test
+    public void jobEqualsToItself() {
+        Job job = createDefaultJob();
+        assertEquals(job, job);
+    }
+
+    @Test
+    public void jobNotEqualsToNull() {
+        assertNotEquals(createDefaultJob(), null);
+    }
+
+    @Test
+    public void notInstanceOfJob() {
+        assertNotEquals(createDefaultJob(), new Object());
+    }
+
+    @Test
+    public void differentJobsButSameContent() {
+        assertEquals(createDefaultJob(), createDefaultJob());
+    }
+
+    @Test
+    public void jobsAreNotEqual() {
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(new Task(2, new Machine(1), 1));
+        Job job = new Job(1, 0, 800, 1.0, tasks);
+
+        assertNotEquals(createDefaultJob(), job);
+    }
+
+    @Test
+    public void testCompareTo() {
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(new Task(2, new Machine(1), 1));
+
+        Job jobOne = new Job(1, 0, 950, 5.0, tasks);
+        Job jobTwo = new Job(2, 0, 800, 2.0, tasks);
+        Job jobThree = new Job(3, 0, 600, 4.0, tasks);
+        Job jobFour = new Job(4, 0, 300, 3.0, tasks);
+        Job jobFive = new Job(5, 0, 500, 3.0, tasks);
+        Job jobSix = new Job(6, 0, 400, 3.0, tasks);
+        Job jobSeven = new Job(7, 0, 600, 4.0, tasks);
+
+        List<Job> jobs = new ArrayList<>();
+
+        jobs.add(jobOne);
+        jobs.add(jobTwo);
+        jobs.add(jobThree);
+        jobs.add(jobFour);
+        jobs.add(jobFive);
+        jobs.add(jobSix);
+        jobs.add(jobSeven);
+
+        List<Integer> expectedList;
+        expectedList = Arrays.asList(1, 3, 7, 4, 6, 5, 2);
+
+        jobs.sort(Collections.reverseOrder());
+
+        List<Integer> orderedList = new ArrayList<>();
+
+        for (Job job : jobs) {
+            orderedList.add(job.getId());
+        }
+
+        assertEquals(expectedList, orderedList);
     }
 }

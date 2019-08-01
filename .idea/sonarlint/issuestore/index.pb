@@ -1,8 +1,4 @@
 
-_
-/src/main/java/com/github/guillesup/JobShop.java,6\9\694d8e685d4fb8d5ce1797375f095cfdde14cc12
-c
-3src/test/java/com/github/guillesup/JobShopTest.java,8\f\8febdb02d060966489e3d02a91b618c9ab56685c
 h
 8src/main/java/com/github/guillesup/entities/Machine.java,0\5\052b84ec2c76ee1efce8b7ce989d92734e9f118e
 h
@@ -19,11 +15,15 @@ e
 build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
 l
 <src/test/java/com/github/guillesup/entities/MachineTest.java,0\4\0475e1693360e9c9bef2ad5dfafa5a6558c4330f
-l
-<src/test/java/com/github/guillesup/entities/ProblemTest.java,2\3\232c7929c38d92f3b1c8586498ce0c15f6760a61
 h
 8src/main/java/com/github/guillesup/entities/Problem.java,d\1\d1e352231d3163893aea4a0e486386abd79a0cb2
-u
-Esrc/test/java/com/github/guillesup/interactors/ProblemLoaderTest.java,d\7\d7d95f9858bae94f6ef8e835328525086ed3e70e
 q
 Asrc/main/java/com/github/guillesup/interactors/ProblemLoader.java,4\e\4e84c580a4e326ffcbd1c4cf825d244e84f89a4e
+A
+config.properties,5\b\5b4197fb87e6e5ff44afbf358a3bd23a35f56456
+u
+Esrc/main/java/com/github/guillesup/utility/ProblemConsolePrinter.java,a\1\a1afde1b9808865701207fa4267dc338dc237e28
+l
+<src/test/java/com/github/guillesup/entities/ProblemTest.java,2\3\232c7929c38d92f3b1c8586498ce0c15f6760a61
+u
+Esrc/test/java/com/github/guillesup/interactors/ProblemLoaderTest.java,d\7\d7d95f9858bae94f6ef8e835328525086ed3e70e

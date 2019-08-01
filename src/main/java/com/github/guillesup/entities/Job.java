@@ -3,12 +3,12 @@ package com.github.guillesup.entities;
 import java.util.List;
 import java.util.Objects;
 
-public class Job {
-    private int id;
-    private int startTime;
-    private int dueDate;
-    private double weight;
-    private List<Task> tasks;
+public class Job implements Comparable<Job> {
+    private final int id;
+    private final int startTime;
+    private final int dueDate;
+    private final double weight;
+    private final List<Task> tasks;
 
     public Job(int id, int startTime, int dueDate, double weight, List<Task> tasks) {
         this.id = id;
@@ -25,16 +25,12 @@ public class Job {
         } else if (this.startTime < 0) {
             throw new JobException("Job startTime must be greater than or equal to zero");
         } else if (this.dueDate < 0) {
-            throw new JobException("Job dueDate must be greater than or equal to zero");
-        } else if (Double.compare(this.weight, 0.0) < 0) {
-            throw new JobException("Job weight must be greater than or equal to zero");
+            throw new JobException("Job dueDate must be greater than zero");
+        } else if (Double.compare(this.weight, 0.0) <= 0) {
+            throw new JobException("Job weight must be greater than zero");
         } else if (this.tasks.isEmpty()) {
             throw new JobException("Job tasks cannot be empty");
         }
-    }
-
-    public int getId() {
-        return this.id;
     }
 
     public int getStartTime() {
@@ -58,27 +54,51 @@ public class Job {
     }
 
     @Override
-    public String toString() {
-        String headerDashes = " -----------------------------------------------\n";
-        String rowDashes = " -------------------------------------------------\n";
-
-        String header = String.format("| %-6s| %-10s| %-5s | %-6s | %-6s |%n",
-                "JobId", "StartTime", "DueDate", "Weight", "#Tasks");
-        String headerContent =
-                String.format("|  %-5d|    %-7d|   %-6d|  %-5.1f |   %-4d |%n",
-                        this.id, this.startTime, this.dueDate, this.weight,
-                        this.tasks.size());
-        String row = String.format("| %-7s| %-10s| %-5s| %-10s| %-8s|%n",
-                "TaskId", "MachineId", "Time", "StartTime", "EndTime");
-        StringBuilder rowContent = new StringBuilder();
-
-        for (Task task : this.tasks) {
-            rowContent.append(task.toString()).append(rowDashes);
+    public int compareTo(Job otherJob) {
+        if (this.weight > otherJob.weight) {
+            return 1;
+        } else if (this.weight < otherJob.weight) {
+            return -1;
+        } else if (this.weight == otherJob.weight && this.dueDate < otherJob.dueDate) {
+            return 1;
+        } else if (this.weight == otherJob.weight && this.dueDate > otherJob.dueDate) {
+            return -1;
         }
 
+        return 0;
+    }
 
-        return headerDashes + header + headerDashes + headerContent +
-                headerDashes + "\n" + rowDashes + row + rowDashes + rowContent;
+    @Override
+    public int hashCode() {
+        return 31 *
+                Objects.hashCode(this.id) +
+                Objects.hashCode(this.startTime) +
+                Objects.hashCode(this.dueDate) +
+                Objects.hashCode(this.weight) +
+                Objects.hashCode(this.tasks);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null)
+            return false;
+
+        if (o == this)
+            return true;
+
+        if (!(o instanceof Job))
+            return false;
+
+        Job otherJob = (Job) o;
+
+        return (this.startTime == otherJob.startTime &&
+                this.dueDate == otherJob.dueDate &&
+                this.weight == otherJob.weight &&
+                this.tasks.equals(otherJob.tasks));
+    }
+
+    public int getId() {
+        return this.id;
     }
 }
 

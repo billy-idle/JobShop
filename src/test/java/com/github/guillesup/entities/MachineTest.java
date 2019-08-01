@@ -14,34 +14,45 @@ public class MachineTest {
 
     @Test
     public void machineEqualsToItself() {
-        Machine machine = new Machine(1);
+        Machine machine = createDefaultMachine();
         assertEquals(machine, machine);
+    }
+
+    private Machine createDefaultMachine() {
+        return new Machine(1);
     }
 
     @Test
     public void machineNotEqualsToNull() {
-        Machine machine = new Machine(1);
-        assertNotEquals(machine, null);
+        assertNotEquals(createDefaultMachine(), null);
     }
 
     @Test
-    public void objectIsInstanceOfMachineButNotEquals() {
-        Machine machineOne = new Machine(1);
-        Machine machineTwo = new Machine(2);
-        assertNotEquals(machineOne, (Object) machineTwo);
+    public void notInstanceOfMachine() {
+        Machine machineOne = createDefaultMachine();
+        assertNotEquals(machineOne, new Object());
     }
 
     @Test
-    public void machineOneEqualToMachineTwo() {
-        Machine machineOne = new Machine(1);
-        Machine machineTwo = new Machine(1);
-        assertEquals(machineOne, machineTwo);
+    public void differentMachinesButSameContent() {
+        assertEquals(createDefaultMachine(), createDefaultMachine());
+    }
+
+    @Test
+    public void machineOneNotEqualToMachineTwo() {
+        assertNotEquals(new Machine(1), new Machine(2));
     }
 
     @Test
     public void sameHashCode() {
-        Machine machineOne = new Machine(1);
-        Machine machineTwo = new Machine(1);
-        assertEquals(machineOne.hashCode(), machineTwo.hashCode());
+        assertEquals(createDefaultMachine().hashCode(),
+                createDefaultMachine().hashCode());
+    }
+
+    @Test
+    public void canGetId() {
+        int id = 5;
+        Machine machine = new Machine(id);
+        assertEquals(machine.getId(), id);
     }
 }
