@@ -2,26 +2,34 @@ package com.github.guillesup.entities;
 
 import java.util.Objects;
 
-public class Task {
+public class Task implements Comparable<Task> {
     private final int id;
-    private final Machine machine;
+    private final int machine;
     private final int time;
+    private final Job job;
     private int startTime;
     private int endTime;
 
-    public Task(int id, Machine machine, int time) {
+    Task(int id, int machine, int time, Job job) {
         this.id = id;
-        this.machine = Objects.requireNonNull(machine, "Task machine must not be null");
+        this.machine = machine;
         this.time = time;
+        this.job = Objects.requireNonNull(job, "Job must not be null!");
         assesInput();
     }
 
     private void assesInput() {
         if (this.time < 0) {
-            throw new TaskException("Time must be greater than or equal to zero");
-        } else if (this.id <= 0) {
-            throw new TaskException("Task Id must be greater than zero");
+            throw new TaskException("Task time must be greater than or equal to zero");
+        } else if (this.id < 0) {
+            throw new TaskException("Task Id must be greater than or equal to zero");
+        } else if (this.machine < 0) {
+            throw new TaskException("Task machine must be greater than or equal to zero");
         }
+    }
+
+    public static Task createTask(int id, int machine, int time, Job job) {
+        return new Task(id, machine, time, job);
     }
 
     public int getEndTime() {
@@ -36,10 +44,8 @@ public class Task {
     private void assesEndTime() {
         if (this.endTime < 0) {
             throw new TaskException("End time must be greater than or equal to zero");
-        }
-
-        if (this.endTime <= this.startTime) {
-            throw new TaskException("End time must be greater than start time");
+        } else if (this.endTime < this.startTime) {
+            throw new TaskException("End time must be greater than or equal to start time");
         }
     }
 
@@ -49,8 +55,7 @@ public class Task {
                 Objects.hashCode(this.id) *
                 Objects.hashCode(this.machine) +
                 Objects.hashCode(this.time) +
-                Objects.hashCode(this.startTime) +
-                Objects.hashCode(this.endTime);
+                Objects.hashCode(this.job);
     }
 
     @Override
@@ -64,25 +69,25 @@ public class Task {
         if (!(o instanceof Task))
             return false;
 
-        Task otherTask = (Task) o;
+        var otherTask = (Task) o;
 
         return (this.id == otherTask.id &&
-                this.machine.equals(otherTask.machine) &&
+                this.machine == otherTask.machine &&
                 this.time == otherTask.time &&
-                this.startTime == otherTask.startTime &&
-                this.endTime == otherTask.endTime);
+                this.job.equals(otherTask.job));
+    }
+
+    @Override
+    public String toString() {
+        return ("" + this.id);
     }
 
     public int getId() {
         return id;
     }
 
-    public Machine getMachine() {
+    public int getMachine() {
         return this.machine;
-    }
-
-    public int getMachineId() {
-        return this.machine.getId();
     }
 
     public int getTime() {
@@ -102,6 +107,19 @@ public class Task {
         if (this.startTime < 0) {
             throw new TaskException("Start time must be greater than or equal to zero");
         }
+    }
+
+    public int getJobId() {
+        return this.job.getId();
+    }
+
+    @Override
+    public int compareTo(Task otherTask) {
+        return this.job.compareTo(otherTask.getJob());
+    }
+
+    public Job getJob() {
+        return this.job;
     }
 }
 

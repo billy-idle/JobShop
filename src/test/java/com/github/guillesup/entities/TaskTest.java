@@ -9,95 +9,96 @@ public class TaskTest {
 
     @Test(expected = TaskException.class)
     public void whenTimeIsNegative() {
-        new Task(1, new Machine(1), -1);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void whenMachineIsNull() {
-        new Task(1, null, 1);
+        Task.createTask(1, 1, -1, Job.createDummyJob());
     }
 
     @Test(expected = TaskException.class)
-    public void whenIdIsLessThanOne() {
-        new Task(0, new Machine(1), 1);
+    public void whenMachineIsLessThanZero() {
+        Task.createTask(1, -1, 1, Job.createDummyJob());
+    }
+
+    @Test(expected = TaskException.class)
+    public void whenIdIsLessThanZero() {
+        Task.createTask(-1, 1, 1, Job.createDummyJob());
     }
 
     @Test(expected = TaskException.class)
     public void whenStartTimeIsNegative() {
-        createDefaultTask().setStartTime(-1);
-    }
-
-    private Task createDefaultTask() {
-        return new Task(1, new Machine(1), 1);
+        DummyTask.createDummyTask().setStartTime(-1);
     }
 
     @Test(expected = TaskException.class)
     public void whenEndTimeIsNegative() {
-        createDefaultTask().setEndTime(-1);
+        DummyTask.createDummyTask().setEndTime(-1);
     }
 
     @Test(expected = TaskException.class)
     public void whenEndTimeIsLessThanStartTime() {
-        Task task = createDefaultTask();
+        Task task = DummyTask.createDummyTask();
         task.setStartTime(50);
         task.setEndTime(49);
     }
 
     @Test(expected = TaskException.class)
     public void whenEndTimeEqualToStartTime() {
-        Task task = createDefaultTask();
+        Task task = DummyTask.createDummyTask();
         task.setStartTime(37);
         task.setEndTime(37);
     }
 
     @Test(expected = TaskException.class)
     public void whenEndTimeIsEqualToStartTime() {
-        Task task = createDefaultTask();
+        Task task = DummyTask.createDummyTask();
         task.setStartTime(50);
         task.setEndTime(50);
     }
 
     @Test
     public void taskEqualsToItself() {
-        Task task = createDefaultTask();
+        Task task = DummyTask.createDummyTask();
         assertEquals(task, task);
     }
 
     @Test
     public void taskNotEqualsToNull() {
-        assertNotEquals(createDefaultTask(), null);
+        assertNotEquals(DummyTask.createDummyTask(), null);
     }
 
     @Test
     public void notInstanceOfTask() {
-        assertNotEquals(createDefaultTask(), new Object());
+        assertNotEquals(DummyTask.createDummyTask(), new Object());
     }
 
     @Test
     public void differentTasksButSameContent() {
-        assertEquals(createDefaultTask(), createDefaultTask());
+        assertEquals(DummyTask.createDummyTask(), DummyTask.createDummyTask());
     }
 
     @Test
     public void tasksAreNotEquals() {
-        assertNotEquals(createDefaultTask(),
-                new Task(2, new Machine(1), 1));
+        Task task = Task.createTask(1, 1, 1, Job.createDummyJob());
+        task.setEndTime(10);
+        assertNotEquals(DummyTask.createDummyTask(), task);
     }
 
     @Test
     public void testPublicGetters() {
-        Task task = createDefaultTask();
+        Job job = Job.createDummyJob();
+        Task task = Task.createTask(1, 1, 1, job);
+        task.setStartTime(0);
+        task.setEndTime(1);
+
         assertTrue(task.getId() == 1 &&
                 task.getTime() == 1 &&
                 task.getStartTime() == 0 &&
-                task.getEndTime() == 0 &&
-                task.getMachine().equals(new Machine(1)) &&
-                task.getMachineId() == 1);
+                task.getEndTime() == 1 &&
+                task.getMachine() == 1 &&
+                task.getJob().equals(job));
     }
 
     @Test
     public void sameHashCode() {
-        assertEquals(createDefaultTask().hashCode(),
-                createDefaultTask().hashCode());
+        assertEquals(DummyTask.createDummyTask().hashCode(),
+                DummyTask.createDummyTask().hashCode());
     }
 }

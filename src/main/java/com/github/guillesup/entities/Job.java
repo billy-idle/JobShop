@@ -1,6 +1,5 @@
 package com.github.guillesup.entities;
 
-import java.util.List;
 import java.util.Objects;
 
 public class Job implements Comparable<Job> {
@@ -8,29 +7,41 @@ public class Job implements Comparable<Job> {
     private final int startTime;
     private final int dueDate;
     private final double weight;
-    private final List<Task> tasks;
+    private final int numberOfTasks;
 
-    public Job(int id, int startTime, int dueDate, double weight, List<Task> tasks) {
+    private Job(int id, int startTime, int dueDate, double weight, int numberOfTasks) {
         this.id = id;
         this.startTime = startTime;
         this.dueDate = dueDate;
         this.weight = weight;
-        this.tasks = Objects.requireNonNull(tasks, "Job tasks must not be null");
+        this.numberOfTasks = numberOfTasks;
         assesInput();
     }
 
     private void assesInput() {
-        if (this.id <= 0) {
-            throw new JobException("Job Id must be greater than zero");
+        if (this.id < 0) {
+            throw new JobException("Job Id must be greater or equal than zero");
         } else if (this.startTime < 0) {
             throw new JobException("Job startTime must be greater than or equal to zero");
         } else if (this.dueDate < 0) {
             throw new JobException("Job dueDate must be greater than zero");
-        } else if (Double.compare(this.weight, 0.0) <= 0) {
-            throw new JobException("Job weight must be greater than zero");
-        } else if (this.tasks.isEmpty()) {
-            throw new JobException("Job tasks cannot be empty");
+        } else if (Double.compare(this.weight, 0.0) < 0) {
+            throw new JobException("Job weight must be greater than or equal to zero");
+        } else if (this.numberOfTasks < 0) {
+            throw new JobException("Job number of tasks must be greater than or equal to zero");
         }
+    }
+
+    public static Job createDummyJob() {
+        return new Job(0, 0, 0, 0.0, 0);
+    }
+
+    public static Job createJob(int id, int startTime, int dueDate, double weight, int numberOfTasks) {
+        return new Job(id, startTime, dueDate, weight, numberOfTasks);
+    }
+
+    public int getNumberOfTasks() {
+        return numberOfTasks;
     }
 
     public int getStartTime() {
@@ -43,14 +54,6 @@ public class Job implements Comparable<Job> {
 
     public double getWeight() {
         return this.weight;
-    }
-
-    public List<Task> getTasks() {
-        return this.tasks;
-    }
-
-    public int getNumberOfTasks() {
-        return this.tasks.size();
     }
 
     @Override
@@ -75,7 +78,7 @@ public class Job implements Comparable<Job> {
                 Objects.hashCode(this.startTime) +
                 Objects.hashCode(this.dueDate) +
                 Objects.hashCode(this.weight) +
-                Objects.hashCode(this.tasks);
+                Objects.hashCode(this.numberOfTasks);
     }
 
     @Override
@@ -89,12 +92,13 @@ public class Job implements Comparable<Job> {
         if (!(o instanceof Job))
             return false;
 
-        Job otherJob = (Job) o;
+        var otherJob = (Job) o;
 
-        return (this.startTime == otherJob.startTime &&
+        return (this.id == otherJob.id &&
+                this.startTime == otherJob.startTime &&
                 this.dueDate == otherJob.dueDate &&
                 this.weight == otherJob.weight &&
-                this.tasks.equals(otherJob.tasks));
+                this.numberOfTasks == otherJob.numberOfTasks);
     }
 
     public int getId() {
