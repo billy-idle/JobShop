@@ -1,7 +1,5 @@
 
 h
-8src/main/java/com/github/guillesup/entities/Machine.java,0\5\052b84ec2c76ee1efce8b7ce989d92734e9f118e
-h
 8src/test/java/com/github/guillesup/entities/JobTest.java,0\c\0ce8c968d449125497194c1e6d690337fefcfa0d
 d
 4src/main/java/com/github/guillesup/entities/Job.java,b\d\bded46e5c250bec220ebf871c665ba609c629908
@@ -13,17 +11,23 @@ e
 settings.gradle,0\5\05efc8b1657769a27696d478ded1e95f38737233
 <
 build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
-l
-<src/test/java/com/github/guillesup/entities/MachineTest.java,0\4\0475e1693360e9c9bef2ad5dfafa5a6558c4330f
 h
 8src/main/java/com/github/guillesup/entities/Problem.java,d\1\d1e352231d3163893aea4a0e486386abd79a0cb2
 q
 Asrc/main/java/com/github/guillesup/interactors/ProblemLoader.java,4\e\4e84c580a4e326ffcbd1c4cf825d244e84f89a4e
 A
 config.properties,5\b\5b4197fb87e6e5ff44afbf358a3bd23a35f56456
-u
-Esrc/main/java/com/github/guillesup/utility/ProblemConsolePrinter.java,a\1\a1afde1b9808865701207fa4267dc338dc237e28
 l
 <src/test/java/com/github/guillesup/entities/ProblemTest.java,2\3\232c7929c38d92f3b1c8586498ce0c15f6760a61
 u
 Esrc/test/java/com/github/guillesup/interactors/ProblemLoaderTest.java,d\7\d7d95f9858bae94f6ef8e835328525086ed3e70e
+T
+$.idea/codeStyles/codeStyleConfig.xml,d\d\dd7b3350c29c49497756c7f32c69a3bed18b1cba
+S
+#.idea/sonarlint/issuestore/index.pb,9\f\9fe84ebb15faf917b7def6236dba604453cc61e0
+n
+>src/main/java/com/github/guillesup/interactors/FileParser.java,2\4\24ba96a920f8350ae7d19f20ee9e9368f647a529
+l
+<src/test/java/com/github/guillesup/entities/MachineTest.java,0\4\0475e1693360e9c9bef2ad5dfafa5a6558c4330f
+h
+8src/main/java/com/github/guillesup/entities/Machine.java,0\5\052b84ec2c76ee1efce8b7ce989d92734e9f118e

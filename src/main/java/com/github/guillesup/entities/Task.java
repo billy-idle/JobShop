@@ -1,35 +1,73 @@
 package com.github.guillesup.entities;
 
-import java.util.Objects;
+import java.util.*;
 
 public class Task implements Comparable<Task> {
-    private final int id;
-    private final int machine;
-    private final int time;
-    private final Job job;
-    private int startTime;
-    private int endTime;
+    private static final Task FICTIVE_INIT_TASK;
+    private static final Task FICTIVE_END_TASK;
 
-    Task(int id, int machine, int time, Job job) {
-        this.id = id;
-        this.machine = machine;
-        this.time = time;
-        this.job = Objects.requireNonNull(job, "Job must not be null!");
-        assesInput();
+    static {
+        FICTIVE_INIT_TASK = new Task(0, Job.getFictiveJob(), Machine.getFictiveMachine(), 0);
+        FICTIVE_END_TASK = new Task(Integer.MAX_VALUE, Job.getFictiveJob(), Machine.getFictiveMachine(), 0);
     }
 
-    private void assesInput() {
+    private final Map<Integer, Task> taskMap;
+    private final List<Task> taskList;
+    private int id;
+    private Machine machine;
+    private int time;
+    private Job job;
+    private int startTime;
+    private int endTime;
+    private int sequenceId;
+
+    {
+        this.taskMap = new HashMap<>();
+        this.taskList = new ArrayList<>();
+    }
+
+    private Task(int id, Job job, Machine machine, int time) {
+        this.id = id;
+        this.machine = Objects.requireNonNull(machine, "Machine must not be null!");
+        this.time = time;
+        this.job = Objects.requireNonNull(job, "Job must not be null!");
+        assessInput();
+    }
+
+    private void assessInput() {
         if (this.time < 0) {
             throw new TaskException("Task time must be greater than or equal to zero");
         } else if (this.id < 0) {
             throw new TaskException("Task Id must be greater than or equal to zero");
-        } else if (this.machine < 0) {
-            throw new TaskException("Task machine must be greater than or equal to zero");
         }
     }
 
-    public static Task createTask(int id, int machine, int time, Job job) {
-        return new Task(id, machine, time, job);
+    public static Task getInstance() {
+        return new Task(0, Job.getInstance(), Machine.getInstance(), 0);
+    }
+
+    public static Task getFictiveInitTask() {
+        return FICTIVE_INIT_TASK;
+    }
+
+    public static Task getFictiveEndTask() {
+        return FICTIVE_END_TASK;
+    }
+
+    public List<Task> getTaskList() {
+        return this.taskList;
+    }
+
+    public Task createTask(Job job, Machine machine, int time) {
+        int taskId = nextId();
+        Task task = new Task(taskId, job, machine, time);
+        this.taskList.add(task);
+        this.taskMap.put(taskId, task);
+        return this.taskMap.get(taskId);
+    }
+
+    private int nextId() {
+        return this.sequenceId++;
     }
 
     public int getEndTime() {
@@ -38,10 +76,10 @@ public class Task implements Comparable<Task> {
 
     public void setEndTime(int endTime) {
         this.endTime = endTime;
-        assesEndTime();
+        assessEndTime();
     }
 
-    private void assesEndTime() {
+    private void assessEndTime() {
         if (this.endTime < 0) {
             throw new TaskException("End time must be greater than or equal to zero");
         } else if (this.endTime < this.startTime) {
@@ -51,8 +89,8 @@ public class Task implements Comparable<Task> {
 
     @Override
     public int hashCode() {
-        return 31 *
-                Objects.hashCode(this.id) *
+        return 31 +
+                Objects.hashCode(this.id) +
                 Objects.hashCode(this.machine) +
                 Objects.hashCode(this.time) +
                 Objects.hashCode(this.job);
@@ -72,21 +110,25 @@ public class Task implements Comparable<Task> {
         var otherTask = (Task) o;
 
         return (this.id == otherTask.id &&
+                this.job.equals(otherTask.job) &&
                 this.machine == otherTask.machine &&
-                this.time == otherTask.time &&
-                this.job.equals(otherTask.job));
+                this.time == otherTask.time);
     }
 
     @Override
     public String toString() {
-        return ("" + this.id);
+        return ("" + this.machine.getId() + this.job.getId());
+    }
+
+    public Job getJob() {
+        return this.job;
     }
 
     public int getId() {
-        return id;
+        return this.id;
     }
 
-    public int getMachine() {
+    public Machine getMachine() {
         return this.machine;
     }
 
@@ -109,17 +151,19 @@ public class Task implements Comparable<Task> {
         }
     }
 
-    public int getJobId() {
-        return this.job.getId();
-    }
-
     @Override
     public int compareTo(Task otherTask) {
-        return this.job.compareTo(otherTask.getJob());
-    }
+        if (job.compareTo(otherTask.job) == 0 && this.id < otherTask.id) {
+            return -1;
+        } else if (job.compareTo(otherTask.job) == 0 && this.id > otherTask.id) {
+            return 1;
+        } else if (job.compareTo(otherTask.job) > 0) {
+            return 1;
+        } else if (job.compareTo(otherTask.job) < 0) {
+            return -1;
+        }
 
-    public Job getJob() {
-        return this.job;
+        return 0;
     }
 }
 

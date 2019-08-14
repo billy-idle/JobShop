@@ -1,13 +1,25 @@
 package com.github.guillesup.entities;
 
-import java.util.Objects;
+import java.util.*;
 
 public class Job implements Comparable<Job> {
-    private final int id;
-    private final int startTime;
-    private final int dueDate;
-    private final double weight;
-    private final int numberOfTasks;
+    private static final Job FICTIVE_JOB;
+
+    static {
+        FICTIVE_JOB = new Job(0, 0, 0, 0, 0);
+    }
+
+    private final Map<Integer, Job> jobMap;
+    private int id;
+    private int startTime;
+    private int dueDate;
+    private double weight;
+    private int numberOfTasks;
+    private int sequence;
+
+    {
+        this.jobMap = new HashMap<>();
+    }
 
     private Job(int id, int startTime, int dueDate, double weight, int numberOfTasks) {
         this.id = id;
@@ -15,10 +27,10 @@ public class Job implements Comparable<Job> {
         this.dueDate = dueDate;
         this.weight = weight;
         this.numberOfTasks = numberOfTasks;
-        assesInput();
+        assessInput();
     }
 
-    private void assesInput() {
+    private void assessInput() {
         if (this.id < 0) {
             throw new JobException("Job Id must be greater or equal than zero");
         } else if (this.startTime < 0) {
@@ -32,16 +44,33 @@ public class Job implements Comparable<Job> {
         }
     }
 
-    public static Job createDummyJob() {
-        return new Job(0, 0, 0, 0.0, 0);
+    private Job() {
+
     }
 
-    public static Job createJob(int id, int startTime, int dueDate, double weight, int numberOfTasks) {
-        return new Job(id, startTime, dueDate, weight, numberOfTasks);
+    public static Job getInstance() {
+        return new Job();
     }
 
-    public int getNumberOfTasks() {
-        return numberOfTasks;
+    public static Job getFictiveJob() {
+        return FICTIVE_JOB;
+    }
+
+    public Job createJob(int startTime, int dueDate, double weight, int numberOfTasks) {
+        int jodId = nextInteger();
+        this.jobMap.put(jodId, new Job(jodId, startTime, dueDate, weight, numberOfTasks));
+        return this.jobMap.get(jodId);
+    }
+
+    private int nextInteger() {
+        return this.sequence++;
+    }
+
+    public List<Job> getSortedJobList() {
+        Collection<Job> values = this.jobMap.values();
+        List<Job> jobList = new ArrayList<>(values);
+        jobList.sort(Collections.reverseOrder());
+        return jobList;
     }
 
     public int getStartTime() {
@@ -73,7 +102,7 @@ public class Job implements Comparable<Job> {
 
     @Override
     public int hashCode() {
-        return 31 *
+        return 167 +
                 Objects.hashCode(this.id) +
                 Objects.hashCode(this.startTime) +
                 Objects.hashCode(this.dueDate) +
@@ -99,6 +128,15 @@ public class Job implements Comparable<Job> {
                 this.dueDate == otherJob.dueDate &&
                 this.weight == otherJob.weight &&
                 this.numberOfTasks == otherJob.numberOfTasks);
+    }
+
+    @Override
+    public String toString() {
+        return "j" + this.id;
+    }
+
+    public int getNumberOfTasks() {
+        return this.numberOfTasks;
     }
 
     public int getId() {
