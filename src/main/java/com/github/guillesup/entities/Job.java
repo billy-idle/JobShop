@@ -1,7 +1,12 @@
 package com.github.guillesup.entities;
 
-import java.util.*;
+import java.util.Objects;
 
+/**
+ * This class represent a job in the Job-Shop problem.
+ *
+ * @author m.mcfly
+ */
 public class Job implements Comparable<Job> {
     private static final Job FICTIVE_JOB;
 
@@ -9,17 +14,11 @@ public class Job implements Comparable<Job> {
         FICTIVE_JOB = new Job(0, 0, 0, 0, 0);
     }
 
-    private final Map<Integer, Job> jobMap;
     private int id;
     private int startTime;
     private int dueDate;
     private double weight;
     private int numberOfTasks;
-    private int sequence;
-
-    {
-        this.jobMap = new HashMap<>();
-    }
 
     private Job(int id, int startTime, int dueDate, double weight, int numberOfTasks) {
         this.id = id;
@@ -44,47 +43,60 @@ public class Job implements Comparable<Job> {
         }
     }
 
-    private Job() {
-
-    }
-
-    public static Job getInstance() {
-        return new Job();
-    }
-
+    /**
+     * {@link #id} int = 0
+     * {@link #startTime} int = 0
+     * {@link #dueDate} int = 0
+     * {@link #weight} int = 0
+     * {@link #numberOfTasks} int = 0
+     *
+     * @return A FICTIVE_JOB only used by Task.FICTIVE_INIT_TASK and Task.FICTIVE_END_TASK.
+     */
     public static Job getFictiveJob() {
         return FICTIVE_JOB;
     }
 
-    public Job createJob(int startTime, int dueDate, double weight, int numberOfTasks) {
-        int jodId = nextInteger();
-        this.jobMap.put(jodId, new Job(jodId, startTime, dueDate, weight, numberOfTasks));
-        return this.jobMap.get(jodId);
+    /**
+     * @param id            int >= 0
+     * @param startTime     int >= 0
+     * @param dueDate       int >= 0
+     * @param weight        int >= 0
+     * @param numberOfTasks int >= 0
+     * @return A new instance of Job.
+     */
+    public static Job createJob(int id, int startTime, int dueDate, double weight, int numberOfTasks) {
+        return new Job(id, startTime, dueDate, weight, numberOfTasks);
     }
 
-    private int nextInteger() {
-        return this.sequence++;
-    }
-
-    public List<Job> getSortedJobList() {
-        Collection<Job> values = this.jobMap.values();
-        List<Job> jobList = new ArrayList<>(values);
-        jobList.sort(Collections.reverseOrder());
-        return jobList;
-    }
-
+    /**
+     * @return An integer value that represents the start time.
+     */
     public int getStartTime() {
         return this.startTime;
     }
 
+    /**
+     * @return An integer value that represents the due date.
+     */
     public int getDueDate() {
         return this.dueDate;
     }
 
+    /**
+     * @return An integer value that represents the weight.
+     */
     public double getWeight() {
         return this.weight;
     }
 
+    /**
+     * Sort by weight and due date.
+     *
+     * @param otherJob Job to compare.
+     * @return (1) if "this.job" is weightier than the "otherJob", (-1) if is the other way,
+     * (1) if both have the same weight but if "this.job" dueDate is less than the "otherJob",
+     * (-1) if is the other way, (0) if they have the same weight and dueDate.
+     */
     @Override
     public int compareTo(Job otherJob) {
         if (this.weight > otherJob.weight) {
@@ -103,7 +115,6 @@ public class Job implements Comparable<Job> {
     @Override
     public int hashCode() {
         return 167 +
-                Objects.hashCode(this.id) +
                 Objects.hashCode(this.startTime) +
                 Objects.hashCode(this.dueDate) +
                 Objects.hashCode(this.weight) +
@@ -132,18 +143,34 @@ public class Job implements Comparable<Job> {
 
     @Override
     public String toString() {
-        return "j" + this.id;
+        return "" + this.id;
     }
 
+    /**
+     * @return An integer value that represents the number of tasks.
+     */
     public int getNumberOfTasks() {
         return this.numberOfTasks;
     }
 
+    /**
+     * @return An integer value that represents the job's Id.
+     */
     public int getId() {
         return this.id;
     }
+
+    /**
+     * @param id Must be an integer greater than or equal to zero.
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
 }
 
+/**
+ * Use to throw exceptions related only with Job class.
+ */
 class JobException extends RuntimeException {
     JobException(String message) {
         super(message);

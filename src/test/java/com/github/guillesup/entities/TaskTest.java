@@ -6,69 +6,67 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class TaskTest {
-    private Task task;
 
     @Before
     public void setUp() throws Exception {
-        task = Task.getInstance();
     }
 
     @Test(expected = TaskException.class)
     public void whenStartTimeIsNegative() {
-        task.createTask(Job.getFictiveJob(), Machine.getFictiveMachine(), 1).setStartTime(-1);
+        Task.createTask(1, Job.getFictiveJob(), Machine.getFictiveMachine(), 1).setStartTime(-1);
     }
 
     @Test(expected = TaskException.class)
     public void whenEndTimeIsNegative() {
-        task.createTask(Job.getFictiveJob(), Machine.getFictiveMachine(), 1).setEndTime(-1);
+        Task.createTask(1, Job.getFictiveJob(), Machine.getFictiveMachine(), 1).setEndTime(-1);
     }
 
     @Test(expected = TaskException.class)
     public void whenEndTimeIsLessThanStartTime() {
-        Task t = task.createTask(Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
-        t.setStartTime(50);
-        t.setEndTime(49);
+        Task task = Task.createTask(1, Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
+        task.setStartTime(50);
+        task.setEndTime(49);
     }
 
     @Test
     public void taskEqualsToItself() {
-        Task t = task.createTask(Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
-        assertEquals(t, t);
+        Task task = Task.createTask(1, Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
+        assertEquals(task, task);
     }
 
     @Test
     public void taskNotEqualsToNull() {
-        Task t = task.createTask(Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
-        assertNotEquals(t, null);
+        Task task = Task.createTask(1, Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
+        assertNotEquals(task, null);
     }
 
     @Test
     public void notInstanceOfTask() {
-        Task t = task.createTask(Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
-        assertNotEquals(t, new Object());
+        Task task = Task.createTask(1, Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
+        assertNotEquals(task, new Object());
     }
 
     @Test
     public void tasksAreNotEquals() {
-        Task t = task.createTask(Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
-        Task t1 = task.createTask(Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
+        Task t = Task.createTask(1, Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
+        Task t1 = Task.createTask(2, Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
         assertNotEquals(t1, t);
     }
 
     @Test
     public void testPublicGetters() {
-        Task t = task.createTask(Job.getFictiveJob(), Machine.getFictiveMachine(), 0);
-        assertTrue(t.getId() == 0 &&
-                t.getTime() == 0 &&
-                t.getStartTime() == 0 &&
-                t.getEndTime() == 0 &&
-                t.getMachine().equals(Machine.getFictiveMachine()) &&
-                t.getJob().equals(Job.getFictiveJob()));
+        Task task = Task.createTask(1, Job.getFictiveJob(), Machine.getFictiveMachine(), 0);
+        assertTrue(task.getId() == 1 &&
+                task.getTime() == 0 &&
+                task.getStartTime() == 0 &&
+                task.getEndTime() == 0 &&
+                task.getMachine().equals(Machine.getFictiveMachine()) &&
+                task.getJob().equals(Job.getFictiveJob()));
     }
 
     @Test
     public void sameHashCode() {
-        Task t = task.createTask(Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
-        assertEquals(t.hashCode(), t.hashCode());
+        Task task = Task.createTask(1, Job.getFictiveJob(), Machine.getFictiveMachine(), 1);
+        assertEquals(task.hashCode(), task.hashCode());
     }
 }

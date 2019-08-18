@@ -1,7 +1,12 @@
 package com.github.guillesup.entities;
 
-import java.util.*;
+import java.util.Objects;
 
+/**
+ * This class represents a machine in the Job-Shop problem.
+ *
+ * @author m.mcfly
+ */
 public final class Machine implements Comparable<Machine> {
     private static final Machine FICTIVE_MACHINE;
 
@@ -9,12 +14,7 @@ public final class Machine implements Comparable<Machine> {
         FICTIVE_MACHINE = new Machine(0);
     }
 
-    private final Map<Integer, Machine> machineMap;
     private int id;
-
-    {
-        this.machineMap = new HashMap<>();
-    }
 
     private Machine(int id) {
         this.id = id;
@@ -27,30 +27,28 @@ public final class Machine implements Comparable<Machine> {
         }
     }
 
-    private Machine() {
-
+    /**
+     * Machine factory method.
+     *
+     * @param id int >= 0
+     * @return A new machine instance.
+     */
+    public static Machine createMachine(int id) {
+        return new Machine(id);
     }
 
-    public static Machine getInstance() {
-        return new Machine();
-    }
-
+    /**
+     * {@link #id} int = 0.
+     *
+     * @return This fictive machine is only used by Task.FICTIVE_INIT_TASK and Task.FICTIVE_END_TASK.
+     */
     public static Machine getFictiveMachine() {
         return FICTIVE_MACHINE;
     }
 
-    public List<Machine> getSortedMachineList() {
-        Collection<Machine> values = machineMap.values();
-        List<Machine> machineList = new ArrayList<>(values);
-        Collections.sort(machineList);
-        return machineList;
-    }
-
-    public Machine createMachine(int id) {
-        machineMap.put(id, new Machine(id));
-        return machineMap.get(id);
-    }
-
+    /**
+     * @return Machine's Id.
+     */
     public int getId() {
         return id;
     }
@@ -95,6 +93,9 @@ public final class Machine implements Comparable<Machine> {
     }
 }
 
+/**
+ * Use to throw exceptions related only with the Machine class.
+ */
 class MachineException extends RuntimeException {
     MachineException(String message) {
         super(message);

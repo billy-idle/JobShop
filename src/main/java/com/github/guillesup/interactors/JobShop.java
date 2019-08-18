@@ -6,46 +6,57 @@ import org.jgrapht.Graphs;
 
 import java.util.*;
 
-public class FlexibleJobShop {
+/**
+ * This class represents a way to solve the Job-Shop problem.
+ * This technique was taught by Paula Criollo.
+ *
+ * @author m.mcfly
+ */
+public class JobShop {
     private final Benchmark benchmark;
 
-    private FlexibleJobShop(Benchmark benchmark) {
+    private JobShop(Benchmark benchmark) {
         this.benchmark = benchmark;
     }
 
-    public static FlexibleJobShop getInstance(Benchmark benchmark) {
-        return new FlexibleJobShop(benchmark);
+    /**
+     * JobShop factory method.
+     *
+     * @param benchmark A benchmark object.
+     * @return A new JobShop instance.
+     */
+    public static JobShop getInstance(Benchmark benchmark) {
+        return new JobShop(benchmark);
     }
 
+    /**
+     * Solution
+     */
     public void schedule() {
-        for (Benchmark bm : this.benchmark.getBenchmarkSet()) {
+        int totalTasks = this.benchmark.getTotalTasks();
+        int sqrOfTotalTasks = (int) Math.sqrt(totalTasks);
+        var taskList = this.benchmark.getTaskList();
+        Collections.sort(taskList);
 
-            int totalTasks = bm.getTotalTasks();
-            int sqrOfTotalTasks = (int) Math.sqrt(totalTasks);
-            var taskList = bm.getTaskList();
-            Collections.sort(taskList);
+        List<Task> snakeOrderTaskList = new ArrayList<>();
 
-            List<Task> snakeOrderTaskList = new ArrayList<>();
-
-            for (int i = 0; i < sqrOfTotalTasks; i++) {
-                for (int j = 0; j < totalTasks; j += sqrOfTotalTasks) {
-                    snakeOrderTaskList.add(taskList.get(i + j));
-                }
+        for (int i = 0; i < sqrOfTotalTasks; i++) {
+            for (int j = 0; j < totalTasks; j += sqrOfTotalTasks) {
+                snakeOrderTaskList.add(taskList.get(i + j));
             }
-
-            List<List<Task>> listOfTaskList = new ArrayList<>();
-
-            for (int i = 0; i < taskList.size(); i += sqrOfTotalTasks) {
-                listOfTaskList.add(snakeOrderTaskList.subList(i, sqrOfTotalTasks + i));
-            }
-
-            for (var tl : listOfTaskList) {
-                tl.sort(Collections.reverseOrder());
-            }
-
-            scheduler(new ArrayList<>(), listOfTaskList.listIterator(), bm);
-
         }
+
+        List<List<Task>> listOfTaskList = new ArrayList<>();
+
+        for (int i = 0; i < taskList.size(); i += sqrOfTotalTasks) {
+            listOfTaskList.add(snakeOrderTaskList.subList(i, sqrOfTotalTasks + i));
+        }
+
+        for (var tl : listOfTaskList) {
+            tl.sort(Collections.reverseOrder());
+        }
+
+        scheduler(new ArrayList<>(), listOfTaskList.listIterator(), this.benchmark);
     }
 
     private void scheduler(List<Task> previousTaskList, Iterator<List<Task>> listIterator, Benchmark benchmark) {
@@ -54,7 +65,7 @@ public class FlexibleJobShop {
 
         for (var nextTask : nextTaskList) {
             optionalTask = nextTaskList.
-                    stream().
+                    parallelStream().
                     filter(t -> t.getMachine().equals(nextTask.getMachine()) &&
                             t.getJob().compareTo(nextTask.getJob()) > 0).
                     reduce((first, second) -> second);
@@ -63,7 +74,7 @@ public class FlexibleJobShop {
                 computeTime(optionalTask.get(), nextTask, benchmark);
             } else {
                 optionalTask = previousTaskList.
-                        stream().
+                        parallelStream().
                         filter(t -> t.getMachine().equals(nextTask.getMachine())).
                         reduce((first, second) -> second);
 
@@ -85,7 +96,7 @@ public class FlexibleJobShop {
 
         var optionalTask =
                 Graphs.predecessorListOf(directedWeightedGraph, nextTask).
-                        stream().
+                        parallelStream().
                         findFirst();
 
         if (optionalTask.isPresent()) {
@@ -99,34 +110,32 @@ public class FlexibleJobShop {
             nextTask.setEndTime(endTime);
             nextTask.setStartTime(startTime);
 
-            benchmark.addDisjunctiveEdge(directedWeightedGraph.addEdge(previousTask, nextTask));
+            benchmark.addDisjunctiveEdge(
+                    Graphs.addEdgeWithVertices(directedWeightedGraph, previousTask, nextTask,
+                            previousTask.getTime()));
         }
-
     }
 
     private void computeTime(Task task, Benchmark benchmark) {
         var directedWeightedGraph = benchmark.getDirectedWeightedGraph();
-        int startTime = 0;
-        int endTime;
 
         var optionalTask =
                 Graphs.predecessorListOf(directedWeightedGraph, task).
-                        stream().
+                        parallelStream().
                         findFirst();
 
         if (optionalTask.isPresent()) {
-            Task predecessor = optionalTask.get();
-            startTime = predecessor.getEndTime();
-            endTime = startTime + task.getTime();
-            task.setEndTime(endTime);
-            task.setStartTime(startTime);
-        } else {
-            endTime = startTime + task.getTime();
+            Task predecessorTask = optionalTask.get();
+            int startTime = predecessorTask.getEndTime();
+            int endTime = startTime + task.getTime();
             task.setEndTime(endTime);
             task.setStartTime(startTime);
         }
     }
 
+    /**
+     * @return benchmark object, with its disjunctive and directed edges.
+     */
     public Benchmark getBenchmark() {
         return this.benchmark;
     }
