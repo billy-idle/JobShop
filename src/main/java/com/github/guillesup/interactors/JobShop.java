@@ -5,6 +5,7 @@ import com.github.guillesup.entities.Task;
 import org.jgrapht.Graphs;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a way to solve the Job-Shop problem.
@@ -56,7 +57,30 @@ public class JobShop {
             tl.sort(Collections.reverseOrder());
         }
 
+        registerObservers(listOfTaskList);
+
         scheduler(new ArrayList<>(), listOfTaskList.listIterator(), this.benchmark);
+
+        updateValues();
+    }
+
+    private void registerObservers(List<List<Task>> listOfTaskList) {
+        List<Task> taskList = listOfTaskList.stream().flatMap(List::stream).collect(Collectors.toList());
+
+        for (int i = 0; i < taskList.size() - 1; i++) {
+            taskList.get(i).registerObserver(taskList.get(i + 1));
+        }
+    }
+
+    private void updateValues() {
+        var optionalTask =
+                this.benchmark.getDirectedWeightedGraph().vertexSet().
+                        stream().
+                        filter(task -> task.getId() == 0).
+                        findFirst();
+
+        optionalTask.ifPresent(task -> task.notifyObservers(this.benchmark.getDirectedWeightedGraph()));
+
     }
 
     private void scheduler(List<Task> previousTaskList, Iterator<List<Task>> listIterator, Benchmark benchmark) {
@@ -64,25 +88,23 @@ public class JobShop {
         var nextTaskList = listIterator.next();
 
         for (var nextTask : nextTaskList) {
-            optionalTask = nextTaskList.
-                    parallelStream().
-                    filter(t -> t.getMachine().equals(nextTask.getMachine()) &&
-                            t.getJob().compareTo(nextTask.getJob()) > 0).
-                    reduce((first, second) -> second);
+            optionalTask =
+                    nextTaskList.
+                            parallelStream().
+                            filter(t -> t.getMachine().equals(nextTask.getMachine()) &&
+                                    t.getJob().compareTo(nextTask.getJob()) > 0).
+                            reduce((first, second) -> second);
 
             if (optionalTask.isPresent()) {
-                computeTime(optionalTask.get(), nextTask, benchmark);
+                addDisjunctiveEdge(optionalTask.get(), nextTask, this.benchmark);
             } else {
-                optionalTask = previousTaskList.
-                        parallelStream().
-                        filter(t -> t.getMachine().equals(nextTask.getMachine())).
-                        reduce((first, second) -> second);
+                optionalTask =
+                        previousTaskList.
+                                parallelStream().
+                                filter(t -> t.getMachine().equals(nextTask.getMachine())).
+                                reduce((first, second) -> second);
 
-                if (optionalTask.isPresent()) {
-                    computeTime(optionalTask.get(), nextTask, benchmark);
-                } else {
-                    computeTime(nextTask, benchmark);
-                }
+                optionalTask.ifPresent(task -> addDisjunctiveEdge(task, nextTask, this.benchmark));
             }
         }
 
@@ -91,46 +113,12 @@ public class JobShop {
         }
     }
 
-    private void computeTime(Task previousTask, Task nextTask, Benchmark benchmark) {
+    private void addDisjunctiveEdge(Task previousTask, Task nextTask, Benchmark benchmark) {
         var directedWeightedGraph = benchmark.getDirectedWeightedGraph();
 
-        var optionalTask =
-                Graphs.predecessorListOf(directedWeightedGraph, nextTask).
-                        parallelStream().
-                        findFirst();
-
-        if (optionalTask.isPresent()) {
-            var predecessorTask = optionalTask.get();
-
-            int startTime = (previousTask.getEndTime() > predecessorTask.getEndTime()) ?
-                    previousTask.getEndTime() : predecessorTask.getEndTime();
-
-            int endTime = startTime + nextTask.getTime();
-
-            nextTask.setEndTime(endTime);
-            nextTask.setStartTime(startTime);
-
-            benchmark.addDisjunctiveEdge(
-                    Graphs.addEdgeWithVertices(directedWeightedGraph, previousTask, nextTask,
-                            previousTask.getTime()));
-        }
-    }
-
-    private void computeTime(Task task, Benchmark benchmark) {
-        var directedWeightedGraph = benchmark.getDirectedWeightedGraph();
-
-        var optionalTask =
-                Graphs.predecessorListOf(directedWeightedGraph, task).
-                        parallelStream().
-                        findFirst();
-
-        if (optionalTask.isPresent()) {
-            Task predecessorTask = optionalTask.get();
-            int startTime = predecessorTask.getEndTime();
-            int endTime = startTime + task.getTime();
-            task.setEndTime(endTime);
-            task.setStartTime(startTime);
-        }
+        benchmark.addDisjunctiveEdge(
+                Graphs.addEdgeWithVertices(directedWeightedGraph, previousTask, nextTask,
+                        previousTask.getTime()));
     }
 
     /**

@@ -1,5 +1,11 @@
 package com.github.guillesup.entities;
 
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.DefaultWeightedEdge;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -7,28 +13,30 @@ import java.util.Objects;
  *
  * @author m.mcfly
  */
-public class Task implements Comparable<Task> {
-    private static final Task FICTIVE_INIT_TASK;
-    private static final Task FICTIVE_END_TASK;
-
-    static {
-        FICTIVE_INIT_TASK = new Task(0, Job.getFictiveJob(), Machine.getFictiveMachine(), 0);
-        FICTIVE_END_TASK = new Task(-1, Job.getFictiveJob(), Machine.getFictiveMachine(), 0);
-    }
-
+public class Task implements Comparable<Task>, Subject, Observer {
     private int id;
     private Machine machine;
     private Job job;
     private int startTime;
     private int endTime;
     private int time;
+    private List<Observer> observerList;
 
     private Task(int id, Job job, Machine machine, int time) {
         this.id = id;
         this.machine = Objects.requireNonNull(machine, "Machine must not be null!");
         this.time = time;
         this.job = Objects.requireNonNull(job, "Job must not be null!");
+        this.observerList = new ArrayList<>();
         assessInput();
+    }
+
+    private void assessInput() {
+        if (this.time < 0) {
+            throw new TaskException("Task time must be greater than or equal to zero");
+        } else if (this.id < -1) {
+            throw new TaskException("Task Id must be greater than or equal to zero");
+        }
     }
 
     /**
@@ -40,7 +48,7 @@ public class Task implements Comparable<Task> {
      * @return FICTIVE_INIT_TASK that represent the starting vertex.
      */
     public static Task getFictiveInitTask() {
-        return FICTIVE_INIT_TASK;
+        return new Task(0, Job.getFictiveJob(), Machine.getFictiveMachine(), 0);
     }
 
     /**
@@ -52,7 +60,7 @@ public class Task implements Comparable<Task> {
      * @return FICTIVE_END_TASK that represent the ending vertex.
      */
     public static Task getFictiveEndTask() {
-        return FICTIVE_END_TASK;
+        return new Task(-1, Job.getFictiveJob(), Machine.getFictiveMachine(), 0);
     }
 
     /**
@@ -66,14 +74,6 @@ public class Task implements Comparable<Task> {
      */
     public static Task createTask(int id, Job job, Machine machine, int time) {
         return new Task(id, job, machine, time);
-    }
-
-    private void assessInput() {
-        if (this.time < 0) {
-            throw new TaskException("Task time must be greater than or equal to zero");
-        } else if (this.id < -1) {
-            throw new TaskException("Task Id must be greater than or equal to zero");
-        }
     }
 
     @Override
@@ -121,10 +121,6 @@ public class Task implements Comparable<Task> {
         return this.machine;
     }
 
-    public int getTime() {
-        return this.time;
-    }
-
     public int getStartTime() {
         return this.startTime;
     }
@@ -132,29 +128,6 @@ public class Task implements Comparable<Task> {
     public void setStartTime(int startTime) {
         this.startTime = startTime;
         assessStartTime();
-    }
-
-    private void assessStartTime() {
-        if (this.startTime < 0) {
-            throw new TaskException("Start time must be greater than or equal to zero");
-        }
-    }
-
-    public int getEndTime() {
-        return this.endTime;
-    }
-
-    public void setEndTime(int endTime) {
-        this.endTime = endTime;
-        assessEndTime();
-    }
-
-    private void assessEndTime() {
-        if (this.endTime < 0) {
-            throw new TaskException("End time must be greater than or equal to zero");
-        } else if (this.endTime < this.startTime) {
-            throw new TaskException("End time must be greater than or equal to start time");
-        }
     }
 
     @Override
@@ -170,6 +143,70 @@ public class Task implements Comparable<Task> {
         }
 
         return 0;
+    }
+
+    @Override
+    public void registerObserver(Observer o) {
+        this.observerList.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        this.observerList.remove(o);
+    }
+
+    @Override
+    public void notifyObservers(Graph<Task, DefaultWeightedEdge> directedWeightedGraph) {
+        for (var o : this.observerList) {
+            o.update(directedWeightedGraph);
+        }
+    }
+
+    @Override
+    public void update(Graph<Task, DefaultWeightedEdge> directedWeightedGraph) {
+        var optionalInteger =
+                Graphs.predecessorListOf(directedWeightedGraph, this).
+                        stream().
+                        map(Task::getEndTime).
+                        max(Integer::compareTo);
+
+        int startTime = 0;
+
+        if (optionalInteger.isPresent()) {
+            startTime = optionalInteger.get();
+        }
+
+        this.setEndTime(startTime + this.getTime());
+        this.setStartTime(startTime);
+
+        this.notifyObservers(directedWeightedGraph);
+    }
+
+    public int getEndTime() {
+        return this.endTime;
+    }
+
+    public int getTime() {
+        return this.time;
+    }
+
+    private void assessEndTime() {
+        if (this.endTime < 0) {
+            throw new TaskException("End time must be greater than or equal to zero");
+        } else if (this.endTime < this.startTime) {
+            throw new TaskException("End time must be greater than or equal to start time");
+        }
+    }
+
+    public void setEndTime(int endTime) {
+        this.endTime = endTime;
+        assessEndTime();
+    }
+
+    private void assessStartTime() {
+        if (this.startTime < 0) {
+            throw new TaskException("Start time must be greater than or equal to zero");
+        }
     }
 }
 

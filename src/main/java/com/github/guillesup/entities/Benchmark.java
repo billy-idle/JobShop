@@ -26,6 +26,8 @@ public class Benchmark {
     private final List<DefaultWeightedEdge> conjunctiveEdgesList;
     private final List<DefaultWeightedEdge> disjunctiveEdgesList;
     private final Graph<Task, DefaultWeightedEdge> directedWeightedGraph;
+    private final Task fictiveInitTask = Task.getFictiveInitTask();
+    private final Task fictiveEndTask = Task.getFictiveEndTask();
 
     private Benchmark(String id, int totalJobs, int totalMachines, int totalTasks, List<Task> taskList) {
         this.id = Objects.requireNonNull(id, "Benchmark id must not be null!");
@@ -50,6 +52,20 @@ public class Benchmark {
         }
     }
 
+    /**
+     * Benchmark factory method.
+     *
+     * @param id            A string, usually the relative path of the benchmark .txt file.
+     * @param totalJobs     int >= 0
+     * @param totalMachines int >= 0
+     * @param totalTasks    int >= 0
+     * @param taskList      ArrayList of tasks (vertices).
+     * @return a new Benchmark instance.
+     */
+    public static Benchmark createBenchmark(String id, int totalJobs, int totalMachines, int totalTasks, List<Task> taskList) {
+        return new Benchmark(id, totalJobs, totalMachines, totalTasks, taskList);
+    }
+
     private void populateDirectedWeightedGraph() {
         for (int i = 0; i < this.taskList.size() - 1; i++) {
             int index = i;
@@ -65,26 +81,17 @@ public class Benchmark {
         for (Task task : this.taskList) {
             if (Graphs.predecessorListOf(this.directedWeightedGraph, task).isEmpty()) {
                 this.conjunctiveEdgesList.add(Graphs.addEdgeWithVertices(this.directedWeightedGraph,
-                        Task.getFictiveInitTask(), task, Task.getFictiveInitTask().getTime()));
+                        this.fictiveInitTask, task, this.fictiveInitTask.getTime()));
+
+                this.fictiveInitTask.registerObserver(task);
+
             } else if (Graphs.successorListOf(this.directedWeightedGraph, task).isEmpty()) {
                 this.conjunctiveEdgesList.add(Graphs.addEdgeWithVertices(this.directedWeightedGraph, task,
-                        Task.getFictiveEndTask(), task.getTime()));
+                        this.fictiveEndTask, task.getTime()));
+
+                task.registerObserver(this.fictiveEndTask);
             }
         }
-    }
-
-    /**
-     * Benchmark factory method.
-     *
-     * @param id            A string, usually the relative path of the benchmark txt file.
-     * @param totalJobs     int >= 0
-     * @param totalMachines int >= 0
-     * @param totalTasks    int >= 0
-     * @param taskList      ArrayList of tasks (vertices).
-     * @return a new Benchmark instance.
-     */
-    public static Benchmark createBenchmark(String id, int totalJobs, int totalMachines, int totalTasks, List<Task> taskList) {
-        return new Benchmark(id, totalJobs, totalMachines, totalTasks, taskList);
     }
 
     /**
@@ -183,7 +190,7 @@ public class Benchmark {
         var allDirectedPaths = new AllDirectedPaths<>(this.directedWeightedGraph);
 
         List<GraphPath<Task, DefaultWeightedEdge>> graphPathList;
-        graphPathList = allDirectedPaths.getAllPaths(Task.getFictiveInitTask(), Task.getFictiveEndTask(), true, null);
+        graphPathList = allDirectedPaths.getAllPaths(this.fictiveInitTask, this.fictiveEndTask, true, null);
 
         var makespan = getMakespan();
         var optionalVertexList = graphPathList.parallelStream().filter(t -> t.getWeight() == makespan).findFirst();
@@ -200,7 +207,7 @@ public class Benchmark {
         var allDirectedPaths = new AllDirectedPaths<>(this.directedWeightedGraph);
 
         var graphPathList =
-                allDirectedPaths.getAllPaths(Task.getFictiveInitTask(), Task.getFictiveEndTask(), true, null);
+                allDirectedPaths.getAllPaths(this.fictiveInitTask, this.fictiveEndTask, true, null);
 
         var optionalMakespan = graphPathList.parallelStream().map(GraphPath::getWeight).max(Double::compareTo);
 

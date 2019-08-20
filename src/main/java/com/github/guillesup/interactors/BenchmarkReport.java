@@ -61,7 +61,7 @@ public class BenchmarkReport {
 
         var output = new StringBuilder();
         var header = "| Task (m:j) | End time | Due date |\n";
-        var dashes = " ---------------------------------- \n";
+        var dashes = "+------------+----------+----------+ \n";
         output.append(dashes).append(header).append(dashes);
 
         for (var task : endTasksList) {

@@ -26,6 +26,7 @@ public class BenchmarkTest {
     private final List<Integer> expectedEndTimeList = new ArrayList<>();
     private Benchmark benchmark;
     private Graph<Task, DefaultWeightedEdge> directedWeightedGraph;
+    private JobShop jobShop;
 
     {
         this.expectedEndTimeList.add(1238);
@@ -43,8 +44,8 @@ public class BenchmarkTest {
     @Before
     public void setUp() throws Exception {
         setPath("benchmark-set\\Only for Unit Tests");
-        var jobShop = JobShop.getInstance(FileParser.getInstance().getBenchmarkList().get(0));
-        jobShop.schedule();
+        this.jobShop = JobShop.getInstance(FileParser.getInstance().getBenchmarkList().get(0));
+        this.jobShop.schedule();
         this.benchmark = jobShop.getBenchmark();
         this.directedWeightedGraph = benchmark.getDirectedWeightedGraph();
     }

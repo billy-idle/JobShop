@@ -171,3 +171,7 @@ k
 ;src/main/java/com/github/guillesup/interactors/Example.java,6\3\63bd7ec4e79c15136a059a521a6f638dbcb044c5
 s
 Csrc/main/java/com/github/guillesup/interactors/BenchmarkReport.java,2\c\2c594cf972d3090a476407dc6e34aa9d34952bf2
+i
+9src/main/java/com/github/guillesup/entities/Observer.java,3\d\3d6115abd377d7e3459dbdd05fc8ab2169285e35
+h
+8src/main/java/com/github/guillesup/entities/Subject.java,2\1\211851194536bfd052a247ee830c35a14af9e102
