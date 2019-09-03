@@ -143,7 +143,7 @@ public class Job implements Comparable<Job> {
 
     @Override
     public String toString() {
-        return "" + this.id;
+        return String.valueOf(this.id);
     }
 
     /**

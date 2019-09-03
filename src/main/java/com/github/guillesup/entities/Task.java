@@ -106,7 +106,11 @@ public class Task implements Comparable<Task>, Subject, Observer {
 
     @Override
     public String toString() {
-        return ("" + this.machine.getId() + ":" + job.toString());
+        return String.valueOf(this.id);
+    }
+
+    public String toJobShopNotation() {
+        return this.machine.getId() + ":" + this.job.getId();
     }
 
     public int getId() {
@@ -198,15 +202,15 @@ public class Task implements Comparable<Task>, Subject, Observer {
         }
     }
 
-    public void setEndTime(int endTime) {
-        this.endTime = endTime;
-        assessEndTime();
-    }
-
     private void assessStartTime() {
         if (this.startTime < 0) {
             throw new TaskException("Start time must be greater than or equal to zero");
         }
+    }
+
+    public void setEndTime(int endTime) {
+        this.endTime = endTime;
+        assessEndTime();
     }
 }
 

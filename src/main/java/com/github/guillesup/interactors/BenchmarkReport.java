@@ -8,9 +8,6 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.util.Collections;
 
-/**
- *
- */
 public class BenchmarkReport {
     private final Benchmark benchmark;
     private final Graph<Task, DefaultWeightedEdge> directedWeightedGraph;
@@ -20,7 +17,7 @@ public class BenchmarkReport {
         this.directedWeightedGraph = this.benchmark.getDirectedWeightedGraph();
     }
 
-    public static BenchmarkReport createReport(Benchmark benchmark) {
+    public static BenchmarkReport getInstance(Benchmark benchmark) {
         return new BenchmarkReport(benchmark);
     }
 
@@ -34,9 +31,11 @@ public class BenchmarkReport {
 
         return dashes + header + dashes +
                 String.format(" Id: %1s%n #Jobs: %2d%n #Machines: %3d%n #Tasks: %4d%n Is the graph acyclic: %5s%n",
-                        this.benchmark.getId(), this.benchmark.getTotalJobs(),
-                        this.benchmark.getTotalMachines(), this.benchmark.getTotalTasks(),
-                        this.benchmark.isGraphAcyclic() ? "No" : "Yes");
+                        this.benchmark.getId(),
+                        this.benchmark.getTotalJobs(),
+                        this.benchmark.getTotalMachines(),
+                        this.benchmark.getTotalTasks(),
+                        this.benchmark.isGraphAcyclic() ? "Yes" : "No");
     }
 
     private String criticalPathReport() {
@@ -44,7 +43,7 @@ public class BenchmarkReport {
         var criticalPath = this.benchmark.getCriticalPath();
         var weight = criticalPath.getWeight();
         var length = criticalPath.getLength();
-        var vertexList = criticalPath.getVertexList();
+        var vertexList = this.benchmark.getMappedCriticalPath();
 
         var header = "Critical Path\n";
         var dashes = "-------------\n";
@@ -56,7 +55,7 @@ public class BenchmarkReport {
     }
 
     private String endTimesReport() {
-        var endTasksList = Graphs.predecessorListOf(directedWeightedGraph, Task.getFictiveEndTask());
+        var endTasksList = Graphs.predecessorListOf(this.directedWeightedGraph, Task.getFictiveEndTask());
         endTasksList.sort(Collections.reverseOrder());
 
         var output = new StringBuilder();
@@ -66,12 +65,18 @@ public class BenchmarkReport {
 
         for (var task : endTasksList) {
             output.append(
-                    String.format("| %10s | %-8d | %-8d |%n", task.toString(), task.getEndTime(),
+                    String.format("| %10s | %-8d | %-8d |%n",
+                            task.toJobShopNotation(),
+                            task.getEndTime(),
                             task.getJob().getDueDate()));
         }
 
         output.append(dashes);
 
         return output.toString();
+    }
+
+    public void exportToDot() {
+        GraphExporter.getInstance(this.benchmark).exportToDot();
     }
 }

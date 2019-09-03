@@ -25,7 +25,7 @@ public class FileParser {
     private Path path;
 
     private FileParser() {
-        benchmarkList = new ArrayList<>();
+        this.benchmarkList = new ArrayList<>();
         readPathConfigFile();
         var pathList = getFilesPath();
         txtToBenchmark(pathList);
@@ -63,62 +63,59 @@ public class FileParser {
 
     private void txtToBenchmark(List<Path> pathList) {
         for (var p : pathList) {
+            this.benchmarkList.add(processLines(p));
+        }
+    }
 
-            int totalJobs = 0;
-            int totalMachines = 0;
-            int totalTasks = 0;
+    private Benchmark processLines(Path p) {
+        int totalJobs = 0;
+        int totalMachines = 0;
+        int totalTasks = 0;
 
-            List<Task> taskList = new ArrayList<>();
-            final List<String> allLines;
+        List<Task> taskList = new ArrayList<>();
+        final List<String> allLines;
 
-            try {
-                allLines = Files.readAllLines(p);
+        String benchmarkId = p.getFileName().toString();
 
-                String benchmarkId = p.toString();
+        try {
+            allLines = Files.readAllLines(p);
 
-                try (var scanner = new Scanner(allLines.get(0))) {
-                    while (scanner.hasNext()) {
-                        totalJobs = Integer.parseInt(scanner.next()); // #Jobs
-                        totalMachines = Integer.parseInt(scanner.next()); // #Machines
-                        totalTasks = Integer.parseInt(scanner.next()); // #Tasks
-                    }
+            try (var scanner = new Scanner(allLines.get(0))) {
+                while (scanner.hasNext()) {
+                    totalJobs = Integer.parseInt(scanner.next()); // #Jobs
+                    totalMachines = Integer.parseInt(scanner.next()); // #Machines
+                    totalTasks = Integer.parseInt(scanner.next()); // #Tasks
                 }
+            }
 
-                int jobId = 1;
-                int taskId = 1;
+            int jobId = 1;
+            int taskId = 1;
 
-                for (int i = 1; i < allLines.size(); i++) {
-                    try (var scanner = new Scanner(allLines.get(i))) {
+            for (int i = 1; i < allLines.size(); i++) {
+                try (var scanner = new Scanner(allLines.get(i))) {
+                    while (scanner.hasNext()) {
+                        int startTime = Integer.parseInt(scanner.next());
+                        int dueDate = Integer.parseInt(scanner.next());
+                        double weight = Double.parseDouble(scanner.next());
+                        int numberOfTasks = Integer.parseInt(scanner.next());
+
+                        Job job = Job.createJob(jobId++, startTime, dueDate, weight, numberOfTasks);
+
                         while (scanner.hasNext()) {
-                            int startTime = Integer.parseInt(scanner.next());
-                            int dueDate = Integer.parseInt(scanner.next());
-                            double weight = Double.parseDouble(scanner.next());
-                            int numberOfTasks = Integer.parseInt(scanner.next());
-
-                            Job job = Job.createJob(jobId++, startTime, dueDate, weight, numberOfTasks);
-
-                            while (scanner.hasNext()) {
-                                int machineId = Integer.parseInt(scanner.next());
-                                Machine machine = Machine.createMachine(machineId);
-                                int time = Integer.parseInt(scanner.next());
-                                taskList.add(Task.createTask(taskId++, job, machine, time));
-                            }
+                            int machineId = Integer.parseInt(scanner.next());
+                            Machine machine = Machine.createMachine(machineId);
+                            int time = Integer.parseInt(scanner.next());
+                            taskList.add(Task.createTask(taskId++, job, machine, time));
                         }
                     }
                 }
-
-                sortThenRenameJobs(taskList);
-
-                Benchmark benchmark =
-                        Benchmark.createBenchmark(benchmarkId, totalJobs, totalMachines, totalTasks, taskList);
-
-                benchmarkList.add(benchmark);
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        sortThenRenameJobs(taskList);
+        return Benchmark.createBenchmark(benchmarkId, totalJobs, totalMachines, totalTasks, taskList);
     }
 
     private void sortThenRenameJobs(List<Task> taskList) {
@@ -150,6 +147,13 @@ public class FileParser {
      * @return An ArrayList of benchmarks.
      */
     public List<Benchmark> getBenchmarkList() {
-        return benchmarkList;
+        return this.benchmarkList;
+    }
+
+    public Benchmark getBenchmark(String filename) {
+        return this.benchmarkList.
+                stream().
+                filter(t -> t.getId().contains(filename)).
+                findFirst().orElseThrow();
     }
 }

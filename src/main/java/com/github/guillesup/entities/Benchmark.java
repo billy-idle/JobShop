@@ -1,5 +1,6 @@
 package com.github.guillesup.entities;
 
+import com.github.guillesup.interactors.JobShop;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -8,9 +9,8 @@ import org.jgrapht.alg.shortestpath.AllDirectedPaths;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a benchmark.
@@ -28,6 +28,7 @@ public class Benchmark {
     private final Graph<Task, DefaultWeightedEdge> directedWeightedGraph;
     private final Task fictiveInitTask = Task.getFictiveInitTask();
     private final Task fictiveEndTask = Task.getFictiveEndTask();
+    private Map<Task, String> taskMap;
 
     private Benchmark(String id, int totalJobs, int totalMachines, int totalTasks, List<Task> taskList) {
         this.id = Objects.requireNonNull(id, "Benchmark id must not be null!");
@@ -38,7 +39,9 @@ public class Benchmark {
         this.conjunctiveEdgesList = new ArrayList<>();
         this.disjunctiveEdgesList = new ArrayList<>();
         this.directedWeightedGraph = new DefaultDirectedWeightedGraph<>(DefaultWeightedEdge.class);
+        this.taskMap = new HashMap<>();
         assessInput();
+        populateTaskMap();
         populateDirectedWeightedGraph();
     }
 
@@ -52,18 +55,10 @@ public class Benchmark {
         }
     }
 
-    /**
-     * Benchmark factory method.
-     *
-     * @param id            A string, usually the relative path of the benchmark .txt file.
-     * @param totalJobs     int >= 0
-     * @param totalMachines int >= 0
-     * @param totalTasks    int >= 0
-     * @param taskList      ArrayList of tasks (vertices).
-     * @return a new Benchmark instance.
-     */
-    public static Benchmark createBenchmark(String id, int totalJobs, int totalMachines, int totalTasks, List<Task> taskList) {
-        return new Benchmark(id, totalJobs, totalMachines, totalTasks, taskList);
+    private void populateTaskMap() {
+        this.taskList.forEach(task -> this.taskMap.put(task, task.toJobShopNotation()));
+        this.taskMap.put(this.fictiveInitTask, "Init");
+        this.taskMap.put(this.fictiveEndTask, "End");
     }
 
     private void populateDirectedWeightedGraph() {
@@ -92,6 +87,20 @@ public class Benchmark {
                 task.registerObserver(this.fictiveEndTask);
             }
         }
+    }
+
+    /**
+     * Benchmark factory method.
+     *
+     * @param id            A string, usually the relative path of the benchmark .txt file.
+     * @param totalJobs     int >= 0
+     * @param totalMachines int >= 0
+     * @param totalTasks    int >= 0
+     * @param taskList      ArrayList of tasks (vertices).
+     * @return a new Benchmark instance.
+     */
+    public static Benchmark createBenchmark(String id, int totalJobs, int totalMachines, int totalTasks, List<Task> taskList) {
+        return new Benchmark(id, totalJobs, totalMachines, totalTasks, taskList);
     }
 
     /**
@@ -183,6 +192,10 @@ public class Benchmark {
         return this.conjunctiveEdgesList;
     }
 
+    public List<String> getMappedCriticalPath() {
+        return this.getCriticalPath().getVertexList().stream().map(task -> taskMap.get(task)).collect(Collectors.toList());
+    }
+
     /**
      * @return GraphPath that describes the critical path.
      */
@@ -192,12 +205,11 @@ public class Benchmark {
         List<GraphPath<Task, DefaultWeightedEdge>> graphPathList;
         graphPathList = allDirectedPaths.getAllPaths(this.fictiveInitTask, this.fictiveEndTask, true, null);
 
-        var makespan = getMakespan();
-        var optionalVertexList = graphPathList.parallelStream().filter(t -> t.getWeight() == makespan).findFirst();
+        var makespan = this.getMakespan();
+        var optionalGraphPath = graphPathList.parallelStream().filter(t -> t.getWeight() == makespan).findFirst();
 
-        return optionalVertexList.orElseGet(optionalVertexList::get);
+        return optionalGraphPath.orElseGet(optionalGraphPath::get);
     }
-
 
     /**
      * @return The length of the critical path.
@@ -223,7 +235,11 @@ public class Benchmark {
      */
     public boolean isGraphAcyclic() {
         var cycleDetector = new CycleDetector<>(this.directedWeightedGraph);
-        return cycleDetector.detectCycles();
+        return !cycleDetector.detectCycles();
+    }
+
+    public void schedule() {
+        JobShop.getInstance(this).schedule();
     }
 }
 

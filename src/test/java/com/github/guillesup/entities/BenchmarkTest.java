@@ -17,35 +17,30 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class BenchmarkTest {
 
     private final List<Integer> expectedEndTimeList = new ArrayList<>();
     private Benchmark benchmark;
     private Graph<Task, DefaultWeightedEdge> directedWeightedGraph;
-    private JobShop jobShop;
 
     {
-        this.expectedEndTimeList.add(1238);
-        this.expectedEndTimeList.add(1259);
-        this.expectedEndTimeList.add(1436);
-        this.expectedEndTimeList.add(1336);
-        this.expectedEndTimeList.add(1255);
-        this.expectedEndTimeList.add(1317);
-        this.expectedEndTimeList.add(1388);
-        this.expectedEndTimeList.add(1371);
-        this.expectedEndTimeList.add(1431);
-        this.expectedEndTimeList.add(1485);
+
+//        expectedEndTimeList = List.of(1238,1259,1436,1336,1255,1317,1388,1371,1431,1485);
+        Stream.of(1238, 1259, 1436, 1336, 1255, 1317, 1388, 1371, 1431, 1485).
+                map(this.expectedEndTimeList::add).
+                collect(Collectors.toList());
     }
 
     @Before
     public void setUp() throws Exception {
         setPath("benchmark-set\\Only for Unit Tests");
-        this.jobShop = JobShop.getInstance(FileParser.getInstance().getBenchmarkList().get(0));
-        this.jobShop.schedule();
+        JobShop jobShop = JobShop.getInstance(FileParser.getInstance().getBenchmarkList().get(0));
+        jobShop.schedule();
         this.benchmark = jobShop.getBenchmark();
         this.directedWeightedGraph = benchmark.getDirectedWeightedGraph();
     }
@@ -86,13 +81,13 @@ public class BenchmarkTest {
 
     @Test
     public void testCriticalPath() {
-        assertEquals("[0:0, 5:2, 5:6, 7:6, 7:10, 7:1, 7:2, 6:2, 2:2, 3:2, 3:5, 8:5, 8:6, 8:2, " +
-                "8:1, 10:1, 10:6, 10:7, 10:10, 0:0]", this.benchmark.getCriticalPath().getVertexList().toString());
+        assertEquals("[Init, 5:2, 5:6, 7:6, 7:10, 7:1, 7:2, 6:2, 2:2, 3:2, 3:5, 8:5, 8:6, 8:2, " +
+                "8:1, 10:1, 10:6, 10:7, 10:10, End]", this.benchmark.getMappedCriticalPath().toString());
     }
 
     @Test
     public void getId() {
-        assertEquals("benchmark-set\\Only for Unit Tests\\abz5-1.3.txt", this.benchmark.getId());
+        assertEquals("abz5-1.3.txt", this.benchmark.getId());
     }
 
     @Test
@@ -112,6 +107,6 @@ public class BenchmarkTest {
 
     @Test
     public void testIsGraphAcyclic() {
-        assertFalse(this.benchmark.isGraphAcyclic());
+        assertTrue(this.benchmark.isGraphAcyclic());
     }
 }
