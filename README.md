@@ -8,9 +8,9 @@ Given a set _J_ of jobs, a set _M_ of machines and a set _T_ of tasks, we denote
 
 ## 2. How to use it
 
-This is a very first approach looking for a simple solution (schedule) to the well-known Singer & Pinedo benchmark set.
+This approach looks for a simple and unoptimized solution (schedule) to the well-known Singer & Pinedo benchmark-set.
 
-There is a properties file named _config.properties_ located at the root of the project folder with the content:
+config.properties contains the path to the benchmark-set.
 
 ```properties
 #JobShop Properties
@@ -18,7 +18,7 @@ There is a properties file named _config.properties_ located at the root of the 
 path=benchmark-set
 ```
 
-_benchmark-set_ is the path (either relative or absolute) where the .txt files are stored.
+path (either relative or absolute) where the .txt files are stored.
 
 Scheduling and exporting to dot format:
 
