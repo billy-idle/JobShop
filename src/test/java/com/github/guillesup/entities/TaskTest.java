@@ -1,15 +1,10 @@
 package com.github.guillesup.entities;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class TaskTest {
-
-    @Before
-    public void setUp() throws Exception {
-    }
 
     @Test(expected = TaskException.class)
     public void whenStartTimeIsNegative() {

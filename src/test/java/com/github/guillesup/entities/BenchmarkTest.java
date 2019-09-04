@@ -1,6 +1,5 @@
 package com.github.guillesup.entities;
 
-import com.github.guillesup.interactors.FileParser;
 import com.github.guillesup.interactors.JobShop;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
@@ -12,36 +11,29 @@ import org.junit.Test;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class BenchmarkTest {
 
-    private final List<Integer> expectedEndTimeList = new ArrayList<>();
+    private final List<Integer> expectedEndTimeList;
     private Benchmark benchmark;
     private Graph<Task, DefaultWeightedEdge> directedWeightedGraph;
 
     {
-
-//        expectedEndTimeList = List.of(1238,1259,1436,1336,1255,1317,1388,1371,1431,1485);
-        Stream.of(1238, 1259, 1436, 1336, 1255, 1317, 1388, 1371, 1431, 1485).
-                map(this.expectedEndTimeList::add).
-                collect(Collectors.toList());
+        this.expectedEndTimeList = Arrays.asList(1238, 1259, 1436, 1336, 1255, 1317, 1388, 1371, 1431, 1485);
     }
 
     @Before
     public void setUp() throws Exception {
         setPath("benchmark-set\\Only for Unit Tests");
-        JobShop jobShop = JobShop.getInstance(FileParser.getInstance().getBenchmarkList().get(0));
-        jobShop.schedule();
-        this.benchmark = jobShop.getBenchmark();
+        this.benchmark = JobShop.schedule("abz5-1.3");
         this.directedWeightedGraph = benchmark.getDirectedWeightedGraph();
     }
 

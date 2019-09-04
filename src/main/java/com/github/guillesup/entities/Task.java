@@ -14,13 +14,13 @@ import java.util.Objects;
  * @author m.mcfly
  */
 public class Task implements Comparable<Task>, Subject, Observer {
-    private int id;
-    private Machine machine;
-    private Job job;
+    private final int id;
+    private final Machine machine;
+    private final Job job;
     private int startTime;
     private int endTime;
-    private int time;
-    private List<Observer> observerList;
+    private final int time;
+    private final List<Observer> observerList;
 
     private Task(int id, Job job, Machine machine, int time) {
         this.id = id;

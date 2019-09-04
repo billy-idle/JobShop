@@ -1,7 +1,8 @@
-package com.github.guillesup.interactors;
+package com.github.guillesup.interactors.util;
 
 import com.github.guillesup.entities.Benchmark;
 import com.github.guillesup.entities.Task;
+import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.io.FileNotFoundException;
@@ -30,23 +31,24 @@ public class GraphExporter {
 
     private GraphExporter(Benchmark benchmark) {
         this.benchmark = benchmark;
-        this.dotContent = new StringBuilder();
     }
 
     public static GraphExporter getInstance(Benchmark benchmark) {
         return new GraphExporter(benchmark);
     }
 
-    public void exportToDot() {
-        appendTopLevelGraphStatement();
-        appendGraphSettings();
-        appendNodes();
-        appendEdgesForFictiveNode(Task.getFictiveInitTask());
-        appendEdgesForFictiveNode(Task.getFictiveEndTask());
-        appendClusterByJob();
-        appendCriticalPath();
-        appendDisjunctiveEdges();
-        createFile();
+    public void saveDotToDisk() {
+        this.toDot();
+
+        String filename = this.benchmark.getId().replace(".txt", "")
+                .replace("-", "").
+                        replace(".", "").concat(".dot");
+
+        try (var out = new PrintWriter(filename)) {
+            out.println(this.dotContent);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private void appendTopLevelGraphStatement() {
@@ -136,6 +138,21 @@ public class GraphExporter {
         this.dotContent.append("\n\t\t").append(cluster.toString().trim()).append("\n\t}");
     }
 
+    public String toDot() {
+        this.dotContent = new StringBuilder();
+
+        appendTopLevelGraphStatement();
+        appendGraphSettings();
+        appendNodes();
+        appendEdgesForFictiveNode(Task.getFictiveInitTask());
+        appendEdgesForFictiveNode(Task.getFictiveEndTask());
+        appendClusterByJob();
+        appendCriticalPath();
+        appendDisjunctiveEdges();
+
+        return this.dotContent.toString();
+    }
+
     private void appendCriticalPath() {
         String criticalPath = this.benchmark.getCriticalPath().getVertexList().
                 toString().
@@ -144,7 +161,7 @@ public class GraphExporter {
                 replace("]", "").
                 trim();
 
-        this.dotContent.append("\n\n\t{\n\t\t").append(criticalPath).
+        this.dotContent.append("\n\n\t/* Critical Path */").append("\n\t{\n\t\t").append(criticalPath).
                 append(" [color=").append(this.colorMap.get(11)).append("]").append("\n\t}");
     }
 
@@ -166,7 +183,9 @@ public class GraphExporter {
                 edgesOf.addAll(graph.edgesOf(task));
             }
 
-            colorDisjunctiveEdge.append("\n\t{\n\t\tedge[fontcolor=").append(colorMap.get(i)).
+            colorDisjunctiveEdge.
+                    append("\n\t/* Conjunctive Edges of machine ").append(machineId).append(" */").
+                    append("\n\t{\n\t\tedge[fontcolor=").append(colorMap.get(i)).
                     append(" color=").append(colorMap.get(i)).append(" style=dashed]\n\t");
 
             for (var edge : edgesOf) {
@@ -182,21 +201,7 @@ public class GraphExporter {
         }
 
         this.dotContent.append("\n").append(colorDisjunctiveEdge).append("}");
-    }
 
-    private void createFile() {
-        String filename = this.benchmark.getId().replace(".txt", "")
-                .replace("-", "").
-                        replace(".", "").concat(".dot");
-
-        try (var out = new PrintWriter(filename)) {
-            out.println(this.dotContent);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String getDotContent() {
-        return this.dotContent.toString();
+        Graphs.addAllEdges(graph, graph, this.benchmark.getConjunctiveEdgesList());
     }
 }

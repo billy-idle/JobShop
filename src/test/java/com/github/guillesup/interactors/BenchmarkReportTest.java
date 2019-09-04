@@ -1,18 +1,42 @@
 package com.github.guillesup.interactors;
 
-import com.github.guillesup.entities.Benchmark;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class GraphExporterTest {
-
-    private GraphExporter ge;
-    private String expected;
+public class BenchmarkReportTest {
+    private final String expectedReport;
+    private final String expectedDotContent;
+    private BenchmarkReport report;
 
     {
-        this.expected = "strict digraph problem {\n" +
+        this.expectedReport = "------------------------------------\n" +
+                "Benchmark\n" +
+                "------------------------------------\n" +
+                "\t\tId: b101.txt\n" +
+                "\t  Jobs: 3\n" +
+                "  Machines: 3\n" +
+                "\t Tasks: 9\n" +
+                "Is acyclic: Yes\n" +
+                "\n" +
+                "------------------------------------\n" +
+                "Critical Path\n" +
+                "------------------------------------\n" +
+                "Weight: 14\n" +
+                "Length: 4\n" +
+                "  Path: [Init, 3:3, 1:3, 2:3, End]\n" +
+                "\n" +
+                "+------------+----------+----------+ \n" +
+                "| Task (m:j) | End time | Due date |\n" +
+                "+------------+----------+----------+ \n" +
+                "|        3:1 | 13       | 10       |\n" +
+                "|        1:2 | 12       | 11       |\n" +
+                "|        2:3 | 14       | 16       |\n" +
+                "+------------+----------+----------+ \n";
+
+        this.expectedDotContent = "strict digraph b101 {\n" +
                 "\tgraph [center=1 rankdir=LR ordering=out ratio=auto nodesep=0 ranksep=1]\n" +
                 "\tnode [shape=circle height=0.7 fixedsize=true]\n" +
                 "\t9 [ label=\"3:1\" ];\n" +
@@ -59,22 +83,26 @@ public class GraphExporterTest {
                 "\t\t}\n" +
                 "\t}\n" +
                 "\n" +
+                "\t/* Critical Path */\n" +
                 "\t{\n" +
                 "\t\t0 -> 1 -> 2 -> 3 -> -1 [color=red]\n" +
                 "\t}\n" +
                 "\n" +
+                "\t/* Conjunctive Edges of machine 1 */\n" +
                 "\t{\n" +
                 "\t\tedge[fontcolor=cornflowerblue color=cornflowerblue style=dashed]\n" +
                 "\t\t2 -> 6 [label=4];\n" +
                 "\t\t7 -> 2 [label=2];\n" +
                 "\t}\n" +
                 "\n" +
+                "\t/* Conjunctive Edges of machine 2 */\n" +
                 "\t{\n" +
                 "\t\tedge[fontcolor=gold2 color=gold2 style=dashed]\n" +
                 "\t\t4 -> 8 [label=4];\n" +
                 "\t\t8 -> 3 [label=4];\n" +
                 "\t}\n" +
                 "\n" +
+                "\t/* Conjunctive Edges of machine 3 */\n" +
                 "\t{\n" +
                 "\t\tedge[fontcolor=magenta color=magenta style=dashed]\n" +
                 "\t\t1 -> 5 [label=5];\n" +
@@ -83,23 +111,23 @@ public class GraphExporterTest {
                 "}";
     }
 
+
     @Before
     public void setUp() throws Exception {
-        var benchmark = getProblem();
-        JobShop.getInstance(benchmark).schedule();
-        this.ge = GraphExporter.getInstance(benchmark);
-        this.ge.exportToDot();
-    }
-
-    private Benchmark getProblem() {
-        return FileParser.getInstance().getBenchmarkList().
-                stream().
-                filter(t -> t.getId().contains("problem")).
-                findFirst().orElseThrow();
+        var scheduledBenchmark = JobShop.schedule("b101");
+        this.report = BenchmarkReport.getInstance(scheduledBenchmark);
     }
 
     @Test
-    public void testToGraphviz() {
-        assertEquals(this.expected, this.ge.getDotContent());
+    @Ignore
+    public void testReport() {
+        assertEquals(this.expectedReport, report.getReport());
     }
+
+    @Test
+    @Ignore
+    public void testDotContent() {
+        assertEquals(this.expectedDotContent, this.report.toDot());
+    }
+
 }

@@ -3,7 +3,7 @@ package com.github.guillesup.entities;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-public interface Subject {
+interface Subject {
     void registerObserver(Observer o);
 
     void removeObserver(Observer o);

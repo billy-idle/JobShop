@@ -1,6 +1,5 @@
 package com.github.guillesup.entities;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -12,11 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JobTest {
-
-    @Before
-    public void setUp() {
-
-    }
 
     @Test(expected = JobException.class)
     public void startTimeLessThanZero() {

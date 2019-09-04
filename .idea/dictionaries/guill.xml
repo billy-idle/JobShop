@@ -1,3 +1,17 @@
 <component name="ProjectDictionaryState">
-  <dictionary name="guill" />
+  <dictionary name="guill">
+    <words>
+      <w>cornflowerblue</w>
+      <w>deeppink</w>
+      <w>fixedsize</w>
+      <w>fontcolor</w>
+      <w>lightsalmon</w>
+      <w>makespan</w>
+      <w>nodesep</w>
+      <w>olivedrab</w>
+      <w>rankdir</w>
+      <w>ranksep</w>
+      <w>subgraph</w>
+    </words>
+  </dictionary>
 </component>

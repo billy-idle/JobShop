@@ -1,4 +1,4 @@
-package com.github.guillesup.interactors;
+package com.github.guillesup.interactors.util;
 
 import com.github.guillesup.entities.Benchmark;
 import com.github.guillesup.entities.Job;
@@ -150,6 +150,10 @@ public class FileParser {
         return this.benchmarkList;
     }
 
+    /**
+     * @param filename The name of the .txt file.
+     * @return A benchmark instance according to filename.
+     */
     public Benchmark getBenchmark(String filename) {
         return this.benchmarkList.
                 stream().

@@ -1,6 +1,5 @@
 package com.github.guillesup.entities;
 
-import com.github.guillesup.interactors.JobShop;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -28,7 +27,7 @@ public class Benchmark {
     private final Graph<Task, DefaultWeightedEdge> directedWeightedGraph;
     private final Task fictiveInitTask = Task.getFictiveInitTask();
     private final Task fictiveEndTask = Task.getFictiveEndTask();
-    private Map<Task, String> taskMap;
+    private final Map<Task, String> taskMap;
 
     private Benchmark(String id, int totalJobs, int totalMachines, int totalTasks, List<Task> taskList) {
         this.id = Objects.requireNonNull(id, "Benchmark id must not be null!");
@@ -193,7 +192,7 @@ public class Benchmark {
     }
 
     public List<String> getMappedCriticalPath() {
-        return this.getCriticalPath().getVertexList().stream().map(task -> taskMap.get(task)).collect(Collectors.toList());
+        return this.getCriticalPath().getVertexList().stream().map(this.taskMap::get).collect(Collectors.toList());
     }
 
     /**
@@ -236,10 +235,6 @@ public class Benchmark {
     public boolean isGraphAcyclic() {
         var cycleDetector = new CycleDetector<>(this.directedWeightedGraph);
         return !cycleDetector.detectCycles();
-    }
-
-    public void schedule() {
-        JobShop.getInstance(this).schedule();
     }
 }
 

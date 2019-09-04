@@ -2,6 +2,7 @@ package com.github.guillesup.interactors;
 
 import com.github.guillesup.entities.Benchmark;
 import com.github.guillesup.entities.Task;
+import com.github.guillesup.interactors.util.GraphExporter;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -27,31 +28,26 @@ public class BenchmarkReport {
 
     private String resume() {
         var header = "Benchmark\n";
-        var dashes = "---------\n";
+        var dashes = "------------------------------------\n";
 
         return dashes + header + dashes +
-                String.format(" Id: %1s%n #Jobs: %2d%n #Machines: %3d%n #Tasks: %4d%n Is the graph acyclic: %5s%n",
-                        this.benchmark.getId(),
-                        this.benchmark.getTotalJobs(),
-                        this.benchmark.getTotalMachines(),
-                        this.benchmark.getTotalTasks(),
-                        this.benchmark.isGraphAcyclic() ? "Yes" : "No");
+                "\t\tId: " + this.benchmark.getId() + "\n" +
+                "\t  Jobs: " + this.benchmark.getTotalJobs() + "\n" +
+                "  Machines: " + this.benchmark.getTotalMachines() + "\n" +
+                "\t Tasks: " + this.benchmark.getTotalTasks() + "\n" +
+                "Is acyclic: " + (this.benchmark.isGraphAcyclic() ? "Yes" : "No") + "\n";
     }
 
     private String criticalPathReport() {
-        var output = new StringBuilder();
-        var criticalPath = this.benchmark.getCriticalPath();
-        var weight = criticalPath.getWeight();
-        var length = criticalPath.getLength();
-        var vertexList = this.benchmark.getMappedCriticalPath();
+        var cp = this.benchmark.getCriticalPath();
 
         var header = "Critical Path\n";
-        var dashes = "-------------\n";
-        output.append(dashes).append(header).append(dashes).
-                append(String.format(" Weight: %1$d%n Length: %2$d%n Path: %3$s%n",
-                        (int) weight, length, vertexList));
+        var dashes = "------------------------------------\n";
 
-        return output.toString();
+        return dashes + header + dashes +
+                "Weight: " + (int) cp.getWeight() + "\n" +
+                "Length: " + cp.getLength() + "\n" +
+                "  Path: " + this.benchmark.getMappedCriticalPath() + "\n";
     }
 
     private String endTimesReport() {
@@ -76,7 +72,11 @@ public class BenchmarkReport {
         return output.toString();
     }
 
-    public void exportToDot() {
-        GraphExporter.getInstance(this.benchmark).exportToDot();
+    public String toDot() {
+        return GraphExporter.getInstance(this.benchmark).toDot();
+    }
+
+    public void saveDotToDisk() {
+        GraphExporter.getInstance(this.benchmark).saveDotToDisk();
     }
 }
