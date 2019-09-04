@@ -138,10 +138,10 @@ benchmark report:
 ------------------------------------
 Benchmark
 ------------------------------------
-		Id: b101.txt
-	  Jobs: 3
+	Id: b101.txt
+      Jobs: 3
   Machines: 3
-	 Tasks: 9
+     Tasks: 9
 Is acyclic: Yes
 
 ------------------------------------
@@ -164,4 +164,4 @@ b101.dot to PNG
 
 ![alt text][b101.png]
 
-[b101.png]: .\b101.png "b101.png"
+[b101.png]: b101.png "b101.png"
